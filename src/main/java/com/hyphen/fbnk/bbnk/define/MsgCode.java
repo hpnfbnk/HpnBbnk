@@ -1,14 +1,17 @@
 package com.hyphen.fbnk.bbnk.define;
 
+import java.util.Arrays;
+import java.util.List;
+
 public enum MsgCode {
-    MSG_TP_S        ("S"),
-    MSG_TP_D        ("D"),
     MSG_TP_SND_REQ  ("S"),
     MSG_TP_RCV_REQ  ("R"),
     MSG_TP_SND_LST  ("L"),
     MSG_TP_RCV_LST  ("M"),
     MSG_TP_BIN      ("B"),
     MSG_TP_ZIP      ("Z"),
+    MSG_TP_REQ_ALL  ("A"),
+    MSG_TP_REQ_YET  ("E"),
     MSG_OK          ("OK"),
     MSG_ENCODE      ("EUC-KR"),
     MSG_OPEN_REQ    ("0800100"),
@@ -26,11 +29,12 @@ public enum MsgCode {
     DEFAULT         ("");
 
     private final String code;
+    public String getCode() {return code;}
 
     MsgCode(String code) {
         this.code = code;
     }
 
-    public String getCode() {return code;}
-
+    private static final List<MsgCode> MSG_CODE_LIST = Arrays.asList(MsgCode.values());
+    public static MsgCode fromCode(String code){return MSG_CODE_LIST.stream().filter(msgCode -> msgCode.getCode().equals(code.trim())).findFirst().get();}
 }

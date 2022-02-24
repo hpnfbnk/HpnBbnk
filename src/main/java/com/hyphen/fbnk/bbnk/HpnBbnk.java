@@ -44,7 +44,7 @@ public class HpnBbnk {
            new Thread(""+i){
                 @Override
                 public void run() {
-                    boolean result = hpnBbnk.sendData("A00"+getName(),"008"+getName(), "R00", "./sam.txt", "T");
+                    boolean result = hpnBbnk.sendData("A00"+getName(),"008"+getName(), "Y00", "./sam.txt", "T");
                     if(result) System.out.println("[thid:"+getName()+"] hpnBbnk.sendData : SUCCESS");
                     else System.out.println("[thid:"+getName()+"] hpnBbnk.sendData : FAIL");
                 }
@@ -111,7 +111,7 @@ public class HpnBbnk {
         UpdnLib updnLib = new UpdnLib();
         result = updnLib.sndData(ipAddr, port, sendCd, recvCd, infoCd, filePath, this.zipYn, encTp, this.limmitKBps);
 
-        log.debug("result="+result);
+        log.debug("[sendData] result="+result);
         return result;
     }
 

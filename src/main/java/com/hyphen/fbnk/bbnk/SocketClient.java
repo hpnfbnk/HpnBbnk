@@ -25,8 +25,11 @@ public class SocketClient {
     private String  ipAddr = null;
     private int     port = -1;
     private EncTp   encTp = null;
+
+    private EncInfo encInfo = null;
+
     //4_RSASeed
-    private byte[] seedKey = null;
+    //private byte[] seedKey = null;
 
     //4_KEcb
 
@@ -48,7 +51,7 @@ public class SocketClient {
     }
 
     public boolean close(){
-        //System.out.println("SocketClient.close()");
+        log.debug("SocketClient.close()");
         if(this.din!=null) {try {this.din.close();} catch (Exception e) {e.printStackTrace();} finally {this.din=null;}}
         if(this.dout!=null) {try {this.dout.close();} catch (Exception e) {e.printStackTrace();} finally {this.dout=null;}}
         if(!this.sockfd.isClosed()) {try {this.sockfd.close();} catch (Exception e) {} finally {this.sockfd=null;}}
@@ -61,26 +64,43 @@ public class SocketClient {
     }
 
     public void writeMsgSs(byte[] msg) throws IOException {
-        byte[] sbuf = new byte[4+1+msg.length];
-        String hMsg = String.format("%04d%s", msg.length+1, MsgCode.MSG_TP_S.getCode());
+        byte[] sBuf = new byte[4+1+msg.length];
+        String hMsg = String.format("%04d%s", msg.length+1, EncTp.RSA_HD_S.getCode());
 
-        arraycopy(hMsg.getBytes(), 0, sbuf, 0, hMsg.getBytes().length);
-        arraycopy(msg, 0, sbuf, hMsg.getBytes().length, msg.length);
-        write(sbuf);
+        arraycopy(hMsg.getBytes(), 0, sBuf, 0, hMsg.getBytes().length);
+        arraycopy(msg, 0, sBuf, hMsg.getBytes().length, msg.length);
+        write(sBuf);
     }
 
-    public void writeMsg(byte[] msg){
+    public void writeMsg(byte[] msg) throws IOException {
+        byte[] eBuf = null, sBuf = null, dBuf = null;
+        String hMsg = null;
 
         if(encTp==EncTp.SEED){
-
-
-
+            eBuf = encInfo.ks_seed_encrypt(msg);
+            sBuf = new byte[4+1+eBuf.length];
+            hMsg = String.format("%04d%s", eBuf.length+1, EncTp.RSA_HD_D.getCode());
+            arraycopy(hMsg.getBytes(), 0, sBuf, 0, hMsg.getBytes().length);
+            arraycopy(eBuf, 0, sBuf, hMsg.getBytes().length, eBuf.length);
         }else if(encTp==EncTp.KECB){
 
+            dBuf = new byte[4+msg.length];
+            hMsg = String.format("%04d", msg.length);
+            arraycopy(hMsg.getBytes(), 0, dBuf, 0, hMsg.getBytes().length);
+            arraycopy(msg, 0, dBuf, hMsg.getBytes().length, msg.length);
 
 
+
+
+
+        }else{
+            sBuf = new byte[4+msg.length];
+            hMsg = String.format("%04d", msg.length);
+            arraycopy(hMsg.getBytes(), 0, sBuf, 0, hMsg.getBytes().length);
+            arraycopy(msg, 0, sBuf, hMsg.getBytes().length, msg.length);
         }
-
+        //log.debug("[writeMsg] sBuf=["+new String(sBuf)+"]");
+        write(sBuf);
     }
 
     public byte[] read(int len) throws IOException {
@@ -91,37 +111,35 @@ public class SocketClient {
 
     public byte[] readMsg() throws IOException {
         byte[] lenMsg = new byte[Define.MSG_LENGTH.getValue()];
-        byte[] msg = null;
+        byte[] tBuf = null, eBuf = null, rBuf = null;
         int msgLen = 0;
 
         lenMsg = read(lenMsg.length);
-
-
         if(this.encTp==EncTp.SEED){
             msgLen = Integer.parseInt(new String(lenMsg, MsgCode.MSG_ENCODE.getCode()));
-            msg = new byte[msgLen];
-            msg = read(msg.length);
+            tBuf = new byte[msgLen];
+            tBuf = read(tBuf.length);
 
-            if(new String(msg, MsgCode.MSG_ENCODE.getCode()).equals(MsgCode.MSG_TP_S.getCode())){
-
+            if(new String(tBuf, MsgCode.MSG_ENCODE.getCode()).substring(0,1).equals(EncTp.RSA_HD_S.getCode())){
+                rBuf = tBuf;
             }else{
-
+                eBuf = new byte[msgLen-1];
+                arraycopy(tBuf, 1, eBuf, 0, msgLen-1);
+                rBuf = encInfo.ks_seed_decrypt(eBuf);
             }
 
         }else if(this.encTp==EncTp.KECB){
 
+        }else{
+            msgLen = Integer.parseInt(new String(lenMsg, MsgCode.MSG_ENCODE.getCode()));
+            rBuf = read(msgLen);
         }
 
-
-        return msg;
+        return rBuf;
     }
 
-
     public void setEnc() throws Exception {
-        EncInfo encInfo = new EncInfo(this);
-        this.seedKey = encInfo.getSeedKey();
-        log.debug("seedKey="+new String(encInfo.getSeedKey()));
-
+        this.encInfo = new EncInfo(this);
     }
 
     public EncTp getEncTp() {

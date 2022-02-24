@@ -1,8 +1,10 @@
 package com.hyphen.fbnk.bbnk.crypt;
 
 import com.hyphen.fbnk.bbnk.SocketClient;
+import com.hyphen.fbnk.bbnk.define.Define;
 import com.hyphen.fbnk.bbnk.define.EncTp;
 import com.hyphen.fbnk.bbnk.define.MsgCode;
+import com.hyphen.fbnk.bbnk.define.RtnCode;
 import com.hyphen.fbnk.bbnk.logging.Log;
 import com.hyphen.fbnk.bbnk.logging.LogFactory;
 
@@ -10,19 +12,22 @@ import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
-import java.security.InvalidKeyException;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
+import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.RSAPublicKeySpec;
+import java.util.Random;
+
+import static java.lang.System.arraycopy;
 
 public class EncInfo {
     private static final Log log = LogFactory.getLog(EncInfo.class);
 
     private byte[] seedKey = null;
+    private byte[] kEcbTrno = null, kEcbKey = null, kEcbIv = null, kEcbCtrBk = null;
 
     private final SocketClient socketClnt;
     private final EncTp encTp;
@@ -43,12 +48,113 @@ public class EncInfo {
         byte[] rcvMsg = socketClnt.readMsg();
 
         if(!new String(rcvMsg, MsgCode.MSG_ENCODE.getCode()).substring(1).equals(MsgCode.MSG_OK.getCode()))
-            throw new Exception("fail to set sessionkey");
+            throw new Exception("[setRSASeed] fail to set sessionkey");
     }
 
-    private void setKECB(){
-        log.debug("[setKECB]");
+    private void setKECB() throws Exception {
+        Well512.getInstance().initWELL();
+        //Set kEcbKey
+        this.kEcbKey = make_session_key();
+        //log.debug("[setKECB] kEcbKey=["+new String(this.kEcbKey, MsgCode.MSG_ENCODE.getCode())+"]");
+        byte[] kbuf = encrypt_rsa_2048(this.kEcbKey);
 
+        byte[] sbuf = new byte[4+1+2+2+1+256+1];
+        int tlen = sbuf.length-4;
+        arraycopy("0000$C1000".getBytes(), 0, sbuf, 0, 10);
+        arraycopy(kbuf, 0, sbuf, 10, kbuf.length);
+        sbuf[0] = Define.C_STX.getByteValue();
+        sbuf[1]	= (byte) ((tlen >>> 8) & 0xff);
+        sbuf[2]	= (byte) (tlen & 0xff);
+        sbuf[3] = calculate_lrc(sbuf, 3);
+        sbuf[sbuf.length-1] = Define.C_ETX.getByteValue();
+        socketClnt.write(sbuf);
+
+        byte[] rbuf = socketClnt.read(4+1+2+2+16+16+1);
+        log.debug("[setKECB] rbuf=["+new String(rbuf, MsgCode.MSG_ENCODE.getCode())+"]("+rbuf.length+")");
+
+        byte[] respCode = new byte[2];
+        arraycopy(rbuf, 7, respCode, 0, 2);
+        if(RtnCode.fromCode(new String(respCode, MsgCode.MSG_ENCODE.getCode())) != RtnCode.FINE)
+            throw new Exception("[setKECB] fail to set sessionkey");
+
+        //Set kEcbTrno
+        this.kEcbTrno = new byte[16];
+        arraycopy(rbuf, 7+2, kEcbTrno, 0, 16);
+        //log.debug("[setKECB] kEcbTrno=["+new String(this.kEcbTrno, MsgCode.MSG_ENCODE.getCode())+"]");
+
+        //Set kEcbIv
+        byte[] encIv = new byte[16];
+        arraycopy(rbuf, 7+2+16, encIv, 0, 16);
+        this.kEcbIv = aes_128_ecb_decrypt(this.kEcbKey, encIv, 0, 16);
+        //log.debug("[setKECB] kEcbIv=["+new String(this.kEcbIv, MsgCode.MSG_ENCODE.getCode())+"]");
+
+        //Set kEcbCtrBk
+        int t1 = 0, t2 = 0;
+        byte[] nonce = new byte[16];
+        for(int i=0; i<7; i++){
+            t1 = i*2;
+            t2 = t1+1;
+            nonce[i] = (byte)(this.kEcbIv[t1] ^ this.kEcbIv[t2]);
+        }
+        byte uc1 = 0;
+        byte uc2 = 0;
+        if (this.kEcbIv[14] != (uc1 = calculate_lrc(this.kEcbIv, 14)) || this.kEcbIv[15] != (uc2 = (byte) (this.kEcbKey[13] ^ this.kEcbIv[13])))
+            throw new IllegalStateException("ERROR invalid IV");
+        nonce[7] = (byte) (this.kEcbIv[14] ^ this.kEcbIv[15]);
+        byte[] pCtrBlocks = new byte[1024];
+        for (int i = 0; i < pCtrBlocks.length; i += 16) {
+            arraycopy(nonce, 0, pCtrBlocks, i, 8);
+            pCtrBlocks[i + 15] = (byte) (i & 0xff);
+        }
+        this.kEcbCtrBk = aes_128_cbc_encrypt(this.kEcbKey, this.kEcbIv, pCtrBlocks, 0, pCtrBlocks.length);
+    }
+
+    public byte[] aes_128_cbc_encrypt(byte[] k16, byte[] iv, byte[] pbuf, int idx, int len) throws Exception {
+        SecretKeySpec skeySpec = new SecretKeySpec(k16, "AES");
+        Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");	//"AES"
+        cipher.init(Cipher.ENCRYPT_MODE, skeySpec, new IvParameterSpec(iv));
+
+        return cipher.doFinal(pbuf, idx, len);
+    }
+
+    public byte[] aes_128_ecb_decrypt(byte[] k16, byte[] pbuf, int idx, int len) throws Exception {
+        SecretKeySpec skeySpec	= new SecretKeySpec(k16, "AES");		//AES/ECB/NoPadding
+        Cipher cipher	= Cipher.getInstance("AES/ECB/NoPadding");		//AES
+        cipher.init(Cipher.DECRYPT_MODE, skeySpec);
+
+        return cipher.doFinal(pbuf, idx, len);
+    }
+
+    public byte calculate_lrc(byte[]src, int slen){
+        byte c = 0x00;
+        for(int i=0; i<slen; i++) c ^= src[i];
+
+        return c;
+    }
+
+    public byte[] encrypt_rsa_2048(byte[] aes_key) throws Exception {
+        BigInteger modulus 			= new BigInteger("00ef5cd77cc2e16c7c86b216143ce973c05a1ab5717851250ac56cb1ca6bc450118b0e37939049c459bdb8a109b13101952025efb32646271b2616b7fe956ccd8792e60f57155d1ac9d36fa961f7b36776881334506039cca83e34a0e7a684639c6236d09c810cbedb950cdc9295ead4203381861c0eff68d12d193444991df1644f5f7ac4c5a20d3ef418448f238f255627633b4d3dfe0287ada528cf00c46ba452f93cbec551d8c388b32a222b36700c030aefedbb64e49073abe6bf23df66ddbb7a0aab63bcabf5c80b234113016098b5a008a141efa90fdebbddf5032019af3b943e436fa1e0a033d5bd5618c5d08e1f5b7968d55182d21cea8441ac3a75f1",16);
+        BigInteger publicExponent 	= new BigInteger("010001", 16);
+
+        RSAPublicKeySpec pubKeySpec = new RSAPublicKeySpec(modulus, publicExponent);
+        KeyFactory keyfactory   = KeyFactory.getInstance("RSA");
+        PublicKey publickey 	= keyfactory.generatePublic(pubKeySpec);
+
+        Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
+        cipher.init(Cipher.ENCRYPT_MODE, publickey);
+
+        return cipher.doFinal(aes_key);
+    }
+
+    public byte[] make_session_key(){
+        byte[] 	k16		= new byte[16];
+        Random random	= new Random();
+
+        random.nextBytes(k16);
+        k16[15]	= 0;
+        for(int i=0; i < 15; i++)   k16[15]	= (byte) (k16[15] ^ k16[i]);
+
+        return k16;
     }
 
     private byte[] generateKey() throws UnsupportedEncodingException {
@@ -69,8 +175,16 @@ public class EncInfo {
         return cipher.doFinal(sbuf);
     }
 
-
-    public byte[] getSeedKey() {
-        return seedKey;
+    //public byte[] ks_seed_encrypt(byte[] kbuf, byte[] mbuf)
+    public byte[] ks_seed_encrypt(byte[] mbuf) {
+        byte tdata[] = new KSBankSeed(this.seedKey).cbc_encrypt(mbuf);
+        return tdata;
     }
+
+    public byte[] ks_seed_decrypt(byte[] mbuf) {
+        byte tdata[] = new KSBankSeed(this.seedKey).cbc_decrypt(mbuf);
+        return tdata;
+    }
+
+
 }
