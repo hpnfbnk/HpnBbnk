@@ -28,6 +28,7 @@ public class EncInfo {
 
     private byte[] seedKey = null;
     private byte[] kEcbTrno = null, kEcbKey = null, kEcbIv = null, kEcbCtrBk = null;
+    private int kEcbRndIdx = 0;
 
     private final SocketClient socketClnt;
     private final EncTp encTp;
@@ -109,10 +110,42 @@ public class EncInfo {
         this.kEcbCtrBk = aes_128_cbc_encrypt(this.kEcbKey, this.kEcbIv, pCtrBlocks, 0, pCtrBlocks.length);
     }
 
+    public byte[] mem_rnd_to_msg(){
+        byte[]	tmp_bytes	= new byte[16];
+        Random	random		= new Random();
+        String rnd_msg	= String.valueOf(1000000000+kEcbRndIdx);
+        System.arraycopy(rnd_msg.getBytes(), 0, tmp_bytes, 5, 10);
+        tmp_bytes[5]	= '0';
+        tmp_bytes[0]	= (byte) 0xff	;						// 0 - FF
+        tmp_bytes[1]	= (byte) (random.nextInt(255) & 0xff);	// 1 - RN1
+        tmp_bytes[2]	= (byte) (random.nextInt(255) & 0xff);	// 2 - RN2
+        tmp_bytes[3]	= (byte) (random.nextInt(255) & 0xff);	// 3 - RN3
+        tmp_bytes[4]	= (byte) (random.nextInt(255) & 0xff);	// 4 - RN4
+
+        byte 	crc				= calculate_lrc(tmp_bytes, 15);
+        byte[]	rnd_bytes		= new byte[16];
+
+        arraycopy(tmp_bytes, 0, rnd_bytes, 0, 5	);
+        rnd_bytes[5] = crc;
+        arraycopy(tmp_bytes, 5, rnd_bytes, 6, 10	);
+
+        return rnd_bytes;
+    }
+
     public byte[] aes_128_cbc_encrypt(byte[] k16, byte[] iv, byte[] pbuf, int idx, int len) throws Exception {
         SecretKeySpec skeySpec = new SecretKeySpec(k16, "AES");
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");	//"AES"
         cipher.init(Cipher.ENCRYPT_MODE, skeySpec, new IvParameterSpec(iv));
+
+        return cipher.doFinal(pbuf, idx, len);
+    }
+
+
+    //public byte[] aes_128_ecb_encrypt(byte[] k16, byte[] pbuf, int idx, int len) throws Exception {
+    public byte[] aes_128_ecb_encrypt(byte[] pbuf, int idx, int len) throws Exception {
+        SecretKeySpec skeySpec = new SecretKeySpec(this.kEcbKey, "AES");	// AES/ECB/NoPadding
+        Cipher cipher = Cipher.getInstance("AES/ECB/NoPadding");	//AES
+        cipher.init(Cipher.ENCRYPT_MODE, skeySpec);
 
         return cipher.doFinal(pbuf, idx, len);
     }
@@ -175,7 +208,6 @@ public class EncInfo {
         return cipher.doFinal(sbuf);
     }
 
-    //public byte[] ks_seed_encrypt(byte[] kbuf, byte[] mbuf)
     public byte[] ks_seed_encrypt(byte[] mbuf) {
         byte tdata[] = new KSBankSeed(this.seedKey).cbc_encrypt(mbuf);
         return tdata;

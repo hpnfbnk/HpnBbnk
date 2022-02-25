@@ -72,7 +72,7 @@ public class SocketClient {
         write(sBuf);
     }
 
-    public void writeMsg(byte[] msg) throws IOException {
+    public void writeMsg(byte[] msg) throws Exception {
         byte[] eBuf = null, sBuf = null, dBuf = null;
         String hMsg = null;
 
@@ -89,7 +89,8 @@ public class SocketClient {
             arraycopy(hMsg.getBytes(), 0, dBuf, 0, hMsg.getBytes().length);
             arraycopy(msg, 0, dBuf, hMsg.getBytes().length, msg.length);
 
-
+            byte[] rndBytes = encInfo.mem_rnd_to_msg();
+            byte[] encCounter = encInfo.aes_128_ecb_encrypt(rndBytes, 0 , 16);
 
 
 
