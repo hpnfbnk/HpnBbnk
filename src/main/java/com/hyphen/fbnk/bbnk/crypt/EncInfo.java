@@ -71,7 +71,7 @@ public class EncInfo {
         socketClnt.write(sbuf);
 
         byte[] rbuf = socketClnt.read(4+1+2+2+16+16+1);
-        log.debug("[setKECB] rbuf=["+new String(rbuf, MsgCode.MSG_ENCODE.getCode())+"]("+rbuf.length+")");
+        //log.debug("[setKECB] rbuf=["+new String(rbuf, MsgCode.MSG_ENCODE.getCode())+"]("+rbuf.length+")");
 
         byte[] respCode = new byte[2];
         arraycopy(rbuf, 7, respCode, 0, 2);
@@ -86,7 +86,7 @@ public class EncInfo {
         //Set kEcbIv
         byte[] encIv = new byte[16];
         arraycopy(rbuf, 7+2+16, encIv, 0, 16);
-        this.kEcbIv = aes_128_ecb_decrypt(this.kEcbKey, encIv, 0, 16);
+        this.kEcbIv = aes_128_ecb_decrypt(encIv, 0, 16);
         //log.debug("[setKECB] kEcbIv=["+new String(this.kEcbIv, MsgCode.MSG_ENCODE.getCode())+"]");
 
         //Set kEcbCtrBk
@@ -108,6 +108,42 @@ public class EncInfo {
             pCtrBlocks[i + 15] = (byte) (i & 0xff);
         }
         this.kEcbCtrBk = aes_128_cbc_encrypt(this.kEcbKey, this.kEcbIv, pCtrBlocks, 0, pCtrBlocks.length);
+    }
+
+    public int getInnerMsgLen(byte[] msg) throws Exception {
+        if(msg[0] != Define.C_STX.getByteValue())       throw new Exception("Abnormal C_STX");
+        else if(msg[3] != calculate_lrc(msg, 3))    throw new Exception("Abnormal calculate_lrc");
+
+        return (msg[2] | (msg[1] << 8)) ;
+    }
+
+    public byte[] speed_ctr_encrypt(byte[] sbuf, int slen){
+        return speed_ctr_decrypt(sbuf, slen);
+    }
+
+    public byte[] speed_ctr_decrypt(byte[] sbuf, int slen){
+        int bidx = 0, eidx = 0;
+        int rno  = 0, ridx = 0;
+
+        byte[] tbuf = new byte[slen];
+        byte[] ctr_blocks = this.kEcbCtrBk;
+        int tlen = 0;
+        for(int i=0; i<slen && tlen < slen; i+= 80){
+            int[] rinfos = Well512.getInstance().getWELL512();
+            rno 	= rinfos[0];
+            ridx	= rinfos[1];
+            for(int j=0; j<5; j++){
+                eidx	= rno & 0x3f;
+                rno		= rno >>> 6;
+                bidx	= eidx * 16;
+                for(int k=0; (k < 16 && tlen < slen); k++, tlen++){
+                    tbuf[tlen] = (byte) (ctr_blocks[bidx+k] ^ sbuf[tlen]);
+                }
+            }
+        }
+        this.kEcbRndIdx = ridx;
+
+        return tbuf;
     }
 
     public byte[] mem_rnd_to_msg(){
@@ -132,6 +168,29 @@ public class EncInfo {
         return rnd_bytes;
     }
 
+    public boolean msg_to_mem_rnd(byte[] rnd_info){
+        int 	xcnt		= 0;
+        byte[]	tmp_bytes	= new byte[16];
+        byte crc1 = 0, crc2 = 0;
+
+        if(((byte) 0xff ^ rnd_info[0]) != 0 || rnd_info[6] != '0') return false;
+
+        crc1	= rnd_info[5];
+        System.arraycopy(rnd_info, 0, tmp_bytes, 0, 5 );
+        System.arraycopy(rnd_info, 6, tmp_bytes, 5, 10);
+
+        crc2	= calculate_lrc(tmp_bytes, 15);
+        if((crc1 ^ crc2) != 0) return false;
+        int rnd_sidx = Integer.parseInt(new String(tmp_bytes, 5, 10));
+        int cidx = Well512.getInstance().countWELL512();
+        if(cidx != this.kEcbRndIdx || (xcnt = rnd_sidx-this.kEcbRndIdx) < 0) return false;
+        int[]	wnos	= null;
+        for(int i =0; i<xcnt ;i++)
+            wnos	= Well512.getInstance().getWELL512();
+
+        return true;
+    }
+
     public byte[] aes_128_cbc_encrypt(byte[] k16, byte[] iv, byte[] pbuf, int idx, int len) throws Exception {
         SecretKeySpec skeySpec = new SecretKeySpec(k16, "AES");
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");	//"AES"
@@ -150,8 +209,9 @@ public class EncInfo {
         return cipher.doFinal(pbuf, idx, len);
     }
 
-    public byte[] aes_128_ecb_decrypt(byte[] k16, byte[] pbuf, int idx, int len) throws Exception {
-        SecretKeySpec skeySpec	= new SecretKeySpec(k16, "AES");		//AES/ECB/NoPadding
+    //public byte[] aes_128_ecb_decrypt(byte[] k16, byte[] pbuf, int idx, int len) throws Exception {
+    public byte[] aes_128_ecb_decrypt(byte[] pbuf, int idx, int len) throws Exception {
+        SecretKeySpec skeySpec	= new SecretKeySpec(this.kEcbKey, "AES");		//AES/ECB/NoPadding
         Cipher cipher	= Cipher.getInstance("AES/ECB/NoPadding");		//AES
         cipher.init(Cipher.DECRYPT_MODE, skeySpec);
 

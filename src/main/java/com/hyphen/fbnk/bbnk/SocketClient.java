@@ -83,7 +83,6 @@ public class SocketClient {
             arraycopy(hMsg.getBytes(), 0, sBuf, 0, hMsg.getBytes().length);
             arraycopy(eBuf, 0, sBuf, hMsg.getBytes().length, eBuf.length);
         }else if(encTp==EncTp.KECB){
-
             dBuf = new byte[4+msg.length];
             hMsg = String.format("%04d", msg.length);
             arraycopy(hMsg.getBytes(), 0, dBuf, 0, hMsg.getBytes().length);
@@ -91,16 +90,26 @@ public class SocketClient {
 
             byte[] rndBytes = encInfo.mem_rnd_to_msg();
             byte[] encCounter = encInfo.aes_128_ecb_encrypt(rndBytes, 0 , 16);
+            byte[] encData = encInfo.speed_ctr_encrypt(dBuf, msg.length+4);
 
+            sBuf = new byte[7+encCounter.length+encData.length+1];
+            int tlen = sBuf.length-4;
 
-
+            sBuf[0]	= Define.C_STX.getByteValue();
+            sBuf[1]	= (byte)((tlen >>> 8) & 0xff);
+            sBuf[2]	= (byte)(tlen & 0xff);
+            sBuf[3]	= encInfo.calculate_lrc(sBuf, 3);
+            sBuf[4]	= '$';
+            arraycopy("D1".getBytes(), 0, sBuf, 5, 2);
+            arraycopy(encCounter, 0, sBuf, 5+2, encCounter.length);
+            arraycopy(encData, 0, sBuf, 5+2+16, encData.length);
+            sBuf[7+encCounter.length+encData.length] = Define.C_ETX.getByteValue();
         }else{
             sBuf = new byte[4+msg.length];
             hMsg = String.format("%04d", msg.length);
             arraycopy(hMsg.getBytes(), 0, sBuf, 0, hMsg.getBytes().length);
             arraycopy(msg, 0, sBuf, hMsg.getBytes().length, msg.length);
         }
-        //log.debug("[writeMsg] sBuf=["+new String(sBuf)+"]");
         write(sBuf);
     }
 
@@ -110,7 +119,7 @@ public class SocketClient {
         return msg;
     }
 
-    public byte[] readMsg() throws IOException {
+    public byte[] readMsg() throws Exception {
         byte[] lenMsg = new byte[Define.MSG_LENGTH.getValue()];
         byte[] tBuf = null, eBuf = null, rBuf = null;
         int msgLen = 0;
@@ -128,9 +137,25 @@ public class SocketClient {
                 arraycopy(tBuf, 1, eBuf, 0, msgLen-1);
                 rBuf = encInfo.ks_seed_decrypt(eBuf);
             }
-
         }else if(this.encTp==EncTp.KECB){
+            msgLen = encInfo.getInnerMsgLen(lenMsg);
+            tBuf = new byte[msgLen];
+            tBuf = read(tBuf.length);
 
+            if(tBuf[tBuf.length-1] != Define.C_ETX.getByteValue()) throw new Exception("[readMsg] Abnormal C_ETX~!!");
+            else if(tBuf[1] != 'D' || tBuf[2] != '1')   throw new Exception("[readMsg] Abnormal Enc Msg Type~!!");
+
+            byte[] encCounter = new byte[16];
+            byte[] encData  = new byte[msgLen-3-16-1];
+            arraycopy(tBuf, 1+2, encCounter, 0, 16);
+            arraycopy(tBuf, 1+2+16, encData, 0, encData.length);
+
+            byte[] chkBuf = encInfo.aes_128_ecb_decrypt(encCounter, 0, 16);
+            if(!encInfo.msg_to_mem_rnd(chkBuf))  throw new Exception("[readMsg] Invalid encCounter~!!");
+
+            byte[] tmpBuf = encInfo.speed_ctr_decrypt(encData, encData.length);
+            rBuf = new byte[tmpBuf.length-4];
+            arraycopy(tmpBuf, 4, rBuf, 0, rBuf.length);
         }else{
             msgLen = Integer.parseInt(new String(lenMsg, MsgCode.MSG_ENCODE.getCode()));
             rBuf = read(msgLen);

@@ -24,7 +24,7 @@ public class UpdnLib {
 
             //개시전문전송
             sndMsg = new MsgNego(sendCd, recvCd).getMsgOpenReq();
-            log.trace("[sndData] sndMsg=["+new String(sndMsg)+"]");
+            log.trace("[sndData]    sndMsg=["+new String(sndMsg)+"]("+sndMsg.length+")");
             sockClnt.writeMsg(sndMsg);
             //응답전문점검
             chkRplyMsg(sockClnt, MsgCode.MSG_OPEN_REP);
@@ -49,7 +49,7 @@ public class UpdnLib {
 
     public void chkRplyMsg(SocketClient sockClnt, MsgCode msgType) throws Exception {
         byte[] rcvMsg = sockClnt.readMsg();
-        log.trace("[chkRplyMsg] rcvMsg=["+new String(rcvMsg)+"]");
+        log.trace("[chkRplyMsg] rcvMsg=["+new String(rcvMsg)+"]("+rcvMsg.length+")");
 
         MsgNego rplyNegoMsg = new MsgNego(rcvMsg);
         //log.debug("[chkRplyMsg] rplyNegoMsg="+rplyNegoMsg);
