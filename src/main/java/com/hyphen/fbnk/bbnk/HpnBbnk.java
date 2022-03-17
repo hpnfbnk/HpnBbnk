@@ -59,9 +59,9 @@ public class HpnBbnk {
                     //    for (DtoSRList dtoSRList : dtoSRLists)  System.out.println("[thid:"+getName()+"] hpnBbnk.recvList : "+dtoSRList.toString());
 
                     //수신
-                    //boolean result = hpnBbnk.recvData("0081", "A001", "R00", "001", "20220310", "C:\\itjProject\\tmp\\rcv.txt", "T");
-                    //if(result) System.out.println("[thid:"+getName()+"] hpnBbnk.recvData : SUCCESS");
-                    //else System.out.println("[thid:"+getName()+"] hpnBbnk.recvData : FAIL");
+                    boolean result = hpnBbnk.recvData("0081", "A001", "R00", "001", "20220310", "C:\\itjProject\\tmp\\rcv.txt", "T");
+                    if(result) System.out.println("[thid:"+getName()+"] hpnBbnk.recvData : SUCCESS");
+                    else System.out.println("[thid:"+getName()+"] hpnBbnk.recvData : FAIL");
                 }
             }.start();
             try {TimeUnit.SECONDS.sleep(3);} catch (Exception e) {}
