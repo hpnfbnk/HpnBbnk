@@ -6,7 +6,7 @@
 
     <groupId>com.hyphen.fbnk</groupId>
     <artifactId>HpnBbnk</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>HpnBbnk batch firm banking module</name>
     <packaging>jar</packaging>
 
@@ -23,7 +23,6 @@
             <version>1.7.5</version>
         </dependency>
 
-
         <!--
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -38,13 +37,13 @@
             <version>1.0.13</version>
         </dependency>
         -->
-
+        <!--
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>1.7.25</version>
         </dependency>
-
+        -->
         <!--
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>

@@ -31,14 +31,14 @@ public class EncInfo {
     private int kEcbRndIdx = 0;
 
     private final SocketClient socketClnt;
-    private final EncTp encTp;
+    private Well512 well512 = null;
 
     public EncInfo(SocketClient sockClnt) throws Exception {
         this.socketClnt = sockClnt;
-        this.encTp = sockClnt.getEncTp();
+        EncTp encTp = sockClnt.getEncTp();
 
-        if(encTp==EncTp.SEED)       setRSASeed();
-        else if(encTp==EncTp.KECB)  setKECB();
+        if(encTp ==EncTp.SEED)       setRSASeed();
+        else if(encTp ==EncTp.KECB)  setKECB();
     }
 
     private void setRSASeed() throws Exception {
@@ -53,11 +53,13 @@ public class EncInfo {
     }
 
     private void setKECB() throws Exception {
-        Well512.getInstance().initWELL();
+        //Well512.getInstance().initWELL();
+        this.well512 = new Well512();
+
         //Set kEcbKey
         this.kEcbKey = make_session_key();
-        //log.debug("[setKECB] kEcbKey=["+new String(this.kEcbKey, MsgCode.MSG_ENCODE.getCode())+"]");
         byte[] kbuf = encrypt_rsa_2048(this.kEcbKey);
+        //log.debug("[setKECB] kEcbKey=["+new String(this.kEcbKey, MsgCode.MSG_ENCODE.getCode())+"]");
 
         byte[] sbuf = new byte[4+1+2+2+1+256+1];
         int tlen = sbuf.length-4;
@@ -114,7 +116,7 @@ public class EncInfo {
         if(msg[0] != Define.C_STX.getByteValue())       throw new Exception("Abnormal C_STX");
         else if(msg[3] != calculate_lrc(msg, 3))    throw new Exception("Abnormal calculate_lrc");
 
-        return (msg[2] | (msg[1] << 8)) ;
+        return ((msg[2]&0xff) | ((msg[1]&0xff) << 8)) ;
     }
 
     public byte[] speed_ctr_encrypt(byte[] sbuf, int slen){
@@ -129,7 +131,8 @@ public class EncInfo {
         byte[] ctr_blocks = this.kEcbCtrBk;
         int tlen = 0;
         for(int i=0; i<slen && tlen < slen; i+= 80){
-            int[] rinfos = Well512.getInstance().getWELL512();
+            //int[] rinfos = Well512.getInstance().getWELL512();
+            int[] rinfos = well512.getWELL512();
             rno 	= rinfos[0];
             ridx	= rinfos[1];
             for(int j=0; j<5; j++){
@@ -182,11 +185,16 @@ public class EncInfo {
         crc2	= calculate_lrc(tmp_bytes, 15);
         if((crc1 ^ crc2) != 0) return false;
         int rnd_sidx = Integer.parseInt(new String(tmp_bytes, 5, 10));
-        int cidx = Well512.getInstance().countWELL512();
+        //int cidx = Well512.getInstance().countWELL512();
+        int cidx = well512.countWELL512();
+
+        //log.debug("[msg_to_mem_rnd] cidx="+cidx+", kEcbRndIdx="+this.kEcbRndIdx+", rnd_sidx="+rnd_sidx);
         if(cidx != this.kEcbRndIdx || (xcnt = rnd_sidx-this.kEcbRndIdx) < 0) return false;
+
         int[]	wnos	= null;
         for(int i =0; i<xcnt ;i++)
-            wnos	= Well512.getInstance().getWELL512();
+            //wnos	= Well512.getInstance().getWELL512();
+            wnos	= well512.getWELL512();
 
         return true;
     }
@@ -255,7 +263,6 @@ public class EncInfo {
         return sb.append(System.currentTimeMillis()).append(Long.MAX_VALUE).substring(0, 16).getBytes("ksc5601");
     }
 
-    //public static byte[] ks_rsa_encrypt(byte[] sbuf) throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
     public byte[] ks_rsa_encrypt(byte[] sbuf) throws NoSuchAlgorithmException, InvalidKeySpecException, NoSuchPaddingException, InvalidKeyException, IllegalBlockSizeException, BadPaddingException {
         BigInteger modulus			= new BigInteger("d4846c2b8228dddfab9e614da2a324c1cc7b29d848cc005624d3a09667a2aab9073290bace6aa536ddceb3c47ddda78d9954da06c83aa65b939c5ec773a3787e71bec5a1c077bb446c06b393d2537967645d386b4b0b4ec21372fdc728c56693028c1c3915c1c4279793eb3dccefd6bf49b86cc7d88a47b0d44aba9e73750fcd",16);
         BigInteger publicExponent	= new BigInteger("0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000010001",16);

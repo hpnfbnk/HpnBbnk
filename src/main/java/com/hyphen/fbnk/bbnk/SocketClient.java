@@ -25,13 +25,7 @@ public class SocketClient {
     private String  ipAddr = null;
     private int     port = -1;
     private EncTp   encTp = null;
-
     private EncInfo encInfo = null;
-
-    //4_RSASeed
-    //private byte[] seedKey = null;
-
-    //4_KEcb
 
     private SocketClient() {}
     public SocketClient(String ipAddr, int port, EncTp encTp) throws SocketException {
@@ -51,7 +45,7 @@ public class SocketClient {
     }
 
     public boolean close(){
-        log.debug("SocketClient.close()");
+        //log.debug("SocketClient.close()");
         if(this.din!=null) {try {this.din.close();} catch (Exception e) {e.printStackTrace();} finally {this.din=null;}}
         if(this.dout!=null) {try {this.dout.close();} catch (Exception e) {e.printStackTrace();} finally {this.dout=null;}}
         if(!this.sockfd.isClosed()) {try {this.sockfd.close();} catch (Exception e) {} finally {this.sockfd=null;}}
@@ -102,6 +96,7 @@ public class SocketClient {
             sBuf[4]	= '$';
             arraycopy("D1".getBytes(), 0, sBuf, 5, 2);
             arraycopy(encCounter, 0, sBuf, 5+2, encCounter.length);
+            //log.debug("[writeMsg] encCounter=["+new String(encCounter)+"]");
             arraycopy(encData, 0, sBuf, 5+2+16, encData.length);
             sBuf[7+encCounter.length+encData.length] = Define.C_ETX.getByteValue();
         }else{
@@ -139,6 +134,7 @@ public class SocketClient {
             }
         }else if(this.encTp==EncTp.KECB){
             msgLen = encInfo.getInnerMsgLen(lenMsg);
+
             tBuf = new byte[msgLen];
             tBuf = read(tBuf.length);
 
@@ -148,6 +144,7 @@ public class SocketClient {
             byte[] encCounter = new byte[16];
             byte[] encData  = new byte[msgLen-3-16-1];
             arraycopy(tBuf, 1+2, encCounter, 0, 16);
+            //log.debug("[readMsg] encCounter=["+new String(encCounter)+"]");
             arraycopy(tBuf, 1+2+16, encData, 0, encData.length);
 
             byte[] chkBuf = encInfo.aes_128_ecb_decrypt(encCounter, 0, 16);

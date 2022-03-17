@@ -12,14 +12,20 @@ public class Well512
 	
 	private static Well512 ro;
 	
+	/*
 	private Well512(){}
-
 	public static synchronized Well512 getInstance(){
 		if(ro == null){
 			ro	= new Well512();
 		}
 		return ro;
 	}
+	*/
+	public Well512(){
+		counter = 0;
+		index = 0;
+	}
+
 	public int WELLRNG512()
 	{
 		int a=0, b=0, c=0, d=0;
@@ -52,11 +58,13 @@ public class Well512
 		}
 	}
 	
+	/*
 	public void initWELL()
 	{
 		counter = 0;
 		index = 0;
 	}
+	*/
 	
 	public int[] getWELL512()
 	{
