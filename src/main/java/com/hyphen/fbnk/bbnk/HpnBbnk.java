@@ -44,24 +44,27 @@ public class HpnBbnk {
            new Thread(""+i){
                 @Override
                 public void run() {
+                    boolean result = false;
 
                     //송신
-                    //boolean result = hpnBbnk.sendData("A00"+getName(),"018"+getName(), "R00", "C:\\itjProject\\tmp\\a.txt", "T");
+                    //result = hpnBbnk.sendData("A00"+getName(),"018"+getName(), "R00", "C:\\itjProject\\tmp\\22.txt", "T");
+                    result = hpnBbnk.sendData("A00"+getName(),"018"+getName(), "R00", "./snd.txt", "T");
                     //boolean result = hpnBbnk.sendData("A00"+getName(),"018"+getName(), "Y00", "C:\\itjProject\\tmp\\prf.dat", "T");
-                    //if(result) System.out.println("[thid:"+getName()+"] hpnBbnk.sendData : SUCCESS");
-                    //else System.out.println("[thid:"+getName()+"] hpnBbnk.sendData : FAIL");
+                    if(result) System.out.println("[thid:"+getName()+"] hpnBbnk.sendData : SUCCESS");
+                    else System.out.println("[thid:"+getName()+"] hpnBbnk.sendData : FAIL");
 
                     //목록조회
-                    //List<DtoSRList> dtoSRLists = hpnBbnk.recvList("A001", "9999", "ZZZ", "20220308", "20220310", "M", "E", "T");
+                    List<DtoSRList> dtoSRLists = hpnBbnk.recvList("A001", "9999", "ZZZ", "20220308", "20220310", "M", "E", "T");
                     //List<DtoSRList> dtoSRLists = hpnBbnk.getRecvList("A001", "T");
-                    //if(dtoSRLists.isEmpty())    System.out.println("[thid:"+getName()+"] hpnBbnk.recvList : NO_DATA");
-                    //else
-                    //    for (DtoSRList dtoSRList : dtoSRLists)  System.out.println("[thid:"+getName()+"] hpnBbnk.recvList : "+dtoSRList.toString());
+                    if(dtoSRLists.isEmpty())    System.out.println("[thid:"+getName()+"] hpnBbnk.recvList : NO_DATA");
+                    else for (DtoSRList dtoSRList : dtoSRLists)  System.out.println("[thid:"+getName()+"] hpnBbnk.recvList : "+dtoSRList.toString());
 
                     //수신
-                    boolean result = hpnBbnk.recvData("0081", "A001", "R00", "001", "20220310", "C:\\itjProject\\tmp\\rcv.txt", "T");
+                    //result = hpnBbnk.recvData("0081", "A001", "R00", "001", "20220310", "C:\\itjProject\\tmp\\rcv.txt", "T");
+                    result = hpnBbnk.recvData("0081", "A001", "R00", "001", "20220310", "./rcv.txt", "T");
                     if(result) System.out.println("[thid:"+getName()+"] hpnBbnk.recvData : SUCCESS");
                     else System.out.println("[thid:"+getName()+"] hpnBbnk.recvData : FAIL");
+
                 }
             }.start();
             try {TimeUnit.SECONDS.sleep(3);} catch (Exception e) {}

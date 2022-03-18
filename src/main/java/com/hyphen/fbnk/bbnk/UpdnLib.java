@@ -208,8 +208,10 @@ public class UpdnLib {
                     result = true;
                 }
                 //개별종료요청(수신대상없음 후)
-                else if(negoMsg.getMsgType()==MsgCode.MSG_PARTEND_REQ && transRtnCode==RtnCode.NO_DATA)
+                else if(negoMsg.getMsgType()==MsgCode.MSG_PARTEND_REQ && transRtnCode==RtnCode.NO_DATA){
                     sndRplyMsg(sockClnt, negoMsg, MsgCode.MSG_PARTEND_REP, RtnCode.FINE);
+                    result = false;
+                }
                 //전체종료요청
                 else if(negoMsg.getMsgType()==MsgCode.MSG_CLOSE_REQ)
                     break;

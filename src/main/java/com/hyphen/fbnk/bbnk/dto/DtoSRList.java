@@ -10,7 +10,7 @@ public class DtoSRList {
     private long fileSize;
 
     /**
-     * 송수신목록생성
+     * 송수신목록
      * @param infoCd 파일종류구분코드 계좌등록:R00, 자동이체:200, 지급이체(송금):300, 증빙자료:Y00 등..
      * @param sendCd 송신자코드
      * @param recvCd 수신자코드
