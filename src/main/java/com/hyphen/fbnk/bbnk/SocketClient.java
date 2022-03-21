@@ -37,7 +37,6 @@ public class SocketClient {
     }
 
     public boolean connect() throws IOException {
-        //System.out.println("SocketClient.connect()");
         this.sockfd.connect(new InetSocketAddress(ipAddr, port), Define.CONNECTION_TIMEOUT.getValue());
         this.dout    = new DataOutputStream(sockfd.getOutputStream());
         this.din     = new DataInputStream(sockfd.getInputStream());
@@ -45,7 +44,6 @@ public class SocketClient {
     }
 
     public boolean close(){
-        //log.debug("SocketClient.close()");
         if(this.din!=null) {try {this.din.close();} catch (Exception e) {e.printStackTrace();} finally {this.din=null;}}
         if(this.dout!=null) {try {this.dout.close();} catch (Exception e) {e.printStackTrace();} finally {this.dout=null;}}
         if(!this.sockfd.isClosed()) {try {this.sockfd.close();} catch (Exception e) {} finally {this.sockfd=null;}}
