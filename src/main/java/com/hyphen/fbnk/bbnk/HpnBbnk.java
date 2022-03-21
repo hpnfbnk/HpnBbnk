@@ -45,26 +45,18 @@ public class HpnBbnk {
                 @Override
                 public void run() {
                     boolean result = false;
-
                     //송신
-                    //result = hpnBbnk.sendData("A00"+getName(),"018"+getName(), "R00", "C:\\itjProject\\tmp\\22.txt", "T");
                     result = hpnBbnk.sendData("A00"+getName(),"018"+getName(), "R00", "./snd.txt", "T");
-                    //boolean result = hpnBbnk.sendData("A00"+getName(),"018"+getName(), "Y00", "C:\\itjProject\\tmp\\prf.dat", "T");
                     if(result) System.out.println("[thid:"+getName()+"] hpnBbnk.sendData : SUCCESS");
                     else System.out.println("[thid:"+getName()+"] hpnBbnk.sendData : FAIL");
-
                     //목록조회
                     List<DtoSRList> dtoSRLists = hpnBbnk.recvList("A001", "9999", "ZZZ", "20220308", "20220310", "M", "E", "T");
-                    //List<DtoSRList> dtoSRLists = hpnBbnk.getRecvList("A001", "T");
                     if(dtoSRLists.isEmpty())    System.out.println("[thid:"+getName()+"] hpnBbnk.recvList : NO_DATA");
                     else for (DtoSRList dtoSRList : dtoSRLists)  System.out.println("[thid:"+getName()+"] hpnBbnk.recvList : "+dtoSRList.toString());
-
                     //수신
-                    //result = hpnBbnk.recvData("0081", "A001", "R00", "001", "20220310", "C:\\itjProject\\tmp\\rcv.txt", "T");
                     result = hpnBbnk.recvData("0081", "A001", "R00", "001", "20220310", "./rcv.txt", "T");
                     if(result) System.out.println("[thid:"+getName()+"] hpnBbnk.recvData : SUCCESS");
                     else System.out.println("[thid:"+getName()+"] hpnBbnk.recvData : FAIL");
-
                 }
             }.start();
             try {TimeUnit.SECONDS.sleep(3);} catch (Exception e) {}
@@ -134,8 +126,8 @@ public class HpnBbnk {
 
     /**
      * Hyphen으로 요청파일 송신
-     * @param sendCd 송신자코드
-     * @param recvCd 수신자코드
+     * @param sendCd 송신자코드 Hyphen에서 발급한 업체코드
+     * @param recvCd 수신자코드 '0'+3자리은행코드, 하나은행:0081, 농협:0011 등..
      * @param infoCd 파일종류구분코드 계좌등록:R00, 자동이체:200, 지급이체(송금):300, 증빙자료:Y00 등..
      * @param filePath 송신대상파일 위치
      * @param runMode 동작모드 Y:운영 T:test
@@ -212,8 +204,8 @@ public class HpnBbnk {
 
     /**
      * Hyphen에서 결과파일 수신
-     * @param sendCd 송신자코드
-     * @param recvCd 수신자코드
+     * @param sendCd 송신자코드 '0'+3자리은행코드, 하나은행:0081, 농협:0011 등..
+     * @param recvCd 수신자코드 Hyphen에서 발급한 업체코드
      * @param infoCd 파일종류구분코드 계좌등록:R00, 자동이체:200, 지급이체(송금):300, 증빙자료:Y00 등..
      * @param seqNo 파일순번
      * @param sendDt 송신일자

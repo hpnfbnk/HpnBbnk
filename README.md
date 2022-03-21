@@ -57,7 +57,7 @@ HpnBbnk hpnBbnk = new HpnBbnk(true);
 ```java
 /**
 * Hyphen으로 요청파일 송신
-* @param sendCd 송신자코드
+* @param sendCd 송신자코드 Hyphen에서 발급한 업체코드
 * @param recvCd 수신자코드 '0'+3자리은행코드, 하나은행:0081, 농협:0011 등..
 * @param infoCd 파일종류구분코드 계좌등록:R00, 자동이체:200, 지급이체(송금):300, 증빙자료:Y00 등..
 * @param filePath 송신대상파일 위치
@@ -72,7 +72,7 @@ boolean result = hpnBbnk.sendData("A001","0081", "R00", "./send.txt", "T");
 /**
 * 일반적인 조건으로 수신목록 조회 :
 * 최근1주일사이에 조회자가 아직 한번도 수신하지 않은 것들에 대한 수신목록 조회요청
-* @param finderCd 조회자코드
+* @param finderCd 조회자코드 Hyphen에서 발급한 업체코드
 * @param runMode 동작모드 Y:운영 T:test
 * @return 수신목록
 */
@@ -96,8 +96,8 @@ public DtoSRList(String infoCd, String sendCd, String recvCd, String seqNo, Stri
 ```java
 /**
 * Hyphen에서 결과파일 수신
-* @param sendCd 송신자코드
-* @param recvCd 수신자코드
+* @param sendCd 송신자코드 '0'+3자리은행코드, 하나은행:0081, 농협:0011 등..
+* @param recvCd 수신자코드 Hyphen에서 발급한 업체코드
 * @param infoCd 파일종류구분코드 계좌등록:R00, 자동이체:200, 지급이체(송금):300, 증빙자료:Y00 등..
 * @param seqNo 파일순번
 * @param sendDt 송신일자
@@ -108,7 +108,7 @@ public DtoSRList(String infoCd, String sendCd, String recvCd, String seqNo, Stri
 boolean result = hpnBbnk.recvData("0081", "A001", "R00", "001", "20220310", "./rcv.txt", "T");
 ```
 
-* 보다 자세한 내용은 첨부된 [javadoc](https://github.com/hpnfbnk/HpnBbnk/blob/master/docs/index.html) 에 설명되어 있습니다.
+* 보다 자세한 내용은 첨부된 [javadoc](https://hpnfbnk.github.io/HpnBbnk/) 에 설명되어 있습니다.
 
 
 ## 예제
