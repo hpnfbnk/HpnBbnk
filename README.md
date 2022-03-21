@@ -1,10 +1,8 @@
 # HYPHEN BatchFirmBanking Module
 하이픈-배치펌뱅킹서비스용 연동모듈입니다.
 
-
 ## 요구사항
 JAVA 1.8 이상을 요구합니다.
-
 
 ## 설치
 [JitPack](https://jitpack.io/#hpnfbnk/HpnBbnk) 을 통해 maven등으로 설치하실수 있습니다.
@@ -34,7 +32,6 @@ SLF4J 를 사용하시고 log-level이 [debug] 이상이면 log가 기록됩니�
 [debug] level 시 : 주요 세부동작단계에서 logging
 
 [trace] level 시 : 실제로 Hyphen server와 주고받는 전문까지 모두 logging
-
 
 ## 사용법
 
@@ -110,6 +107,17 @@ boolean result = hpnBbnk.recvData("0081", "A001", "R00", "001", "20220310", "./r
 
 * 보다 자세한 내용은 첨부된 [javadoc](https://hpnfbnk.github.io/HpnBbnk/javadoc/) 에 설명되어 있습니다.
 
-
 ## 예제
 [HpnBbnkTest](https://github.com/hpnfbnk/HpnBbnk/blob/master/src/test/java/com/hyphen/fbnk/bbnk/HpnBbnkTest.java) 를 참고해 주세요.
+
+## 기타참고자료
+기타참고자료는 [/docs](https://github.com/hpnfbnk/HpnBbnk/tree/master/docs) 에 포함되 있습니다.
+- [배치펌뱅킹-은행포맷.zip](https://hpnfbnk.github.io/HpnBbnk/배치펌뱅킹-은행포맷.zip) : 은행별 파일포맷
+- [HYPHEN통합(v1004)_파일포맷.xlsx](https://hpnfbnk.github.io/HpnBbnk/HYPHEN통합(v1004)_파일포맷.xlsx) : HYPHEN-공통 파일포맷(HYPHEN 타입)
+- [HYPHEN통합(금결원호환v2001)_파일포맷.docx](https://hpnfbnk.github.io/HpnBbnk/HYPHEN통합(금결원호환v2001)_파일포맷.docx) : HYPHEN-공통 파일포맷(금결원호환 타입)
+- [출금이체정보_통합관리시스템_전산설계서(KSNET)V3.7.docx](https://hpnfbnk.github.io/HpnBbnk/출금이체정보_통합관리시스템_전산설계서(KSNET)V3.7.docx) : 계좌통합관리업무용 안내문서
+- [HYPHEN배치대행_파일포맷(금결원호환v2016).xls](https://hpnfbnk.github.io/HpnBbnk/HYPHEN배치대행_파일포맷(금결원호환v2016).xls) : 배치대행이체 파일포맷
+- [법인카드가맹점신표준전문(banking).xls](https://hpnfbnk.github.io/HpnBbnk/법인카드가맹점신표준전문(banking).xls) : 법인카드사용내역 파일포맷
+- [HYPHEN펌뱅킹_파일종류구분코드표.xlsx](https://hpnfbnk.github.io/HpnBbnk/HYPHEN펌뱅킹_파일종류구분코드표.xlsx) : 파일종류구분표
+- [배치펌뱅킹_오류코드정리.xlsx](https://hpnfbnk.github.io/HpnBbnk/배치펌뱅킹_오류코드정리.xlsx) : 오류코드표
+- [HYPHEN_Tcp송수신전문내역서.xls](https://hpnfbnk.github.io/HpnBbnk/HYPHEN_Tcp송수신전문내역서.xls) : 전문상세내역서
