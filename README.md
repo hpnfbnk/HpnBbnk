@@ -108,7 +108,7 @@ public DtoSRList(String infoCd, String sendCd, String recvCd, String seqNo, Stri
 boolean result = hpnBbnk.recvData("0081", "A001", "R00", "001", "20220310", "./rcv.txt", "T");
 ```
 
-* 보다 자세한 내용은 첨부된 [javadoc](https://hpnfbnk.github.io/HpnBbnk/) 에 설명되어 있습니다.
+* 보다 자세한 내용은 첨부된 [javadoc](https://hpnfbnk.github.io/HpnBbnk/javadoc/) 에 설명되어 있습니다.
 
 
 ## 예제
