@@ -178,7 +178,7 @@ public class HpnBbnk {
      * @return 송수신목록
      */
     public List<DtoSRList> recvList(String finderCd, String targetCd, String infoCd, String fromDt, String toDt, String listTp, String findRng, String runMode){
-        log.debug("[recvList](zzzSTART) sendCd="+finderCd+", recvCd="+targetCd+", infoCd="+infoCd+", fromDt="+fromDt+", toDt="+toDt+", tpList="+listTp+", runMode="+runMode);
+        log.debug("[recvList](test2_START) sendCd="+finderCd+", recvCd="+targetCd+", infoCd="+infoCd+", fromDt="+fromDt+", toDt="+toDt+", tpList="+listTp+", runMode="+runMode);
 
         String ipAddr   = getUseIpAddr(infoCd, runMode, false);
         int port        = getUsePort(infoCd, runMode, false);
