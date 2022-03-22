@@ -6,7 +6,7 @@
 
     <groupId>com.hyphen.fbnk</groupId>
     <artifactId>HpnBbnk</artifactId>
-    <version>1.0.2</version>
+    <version>1.0.3</version>
     <name>HpnBbnk batch firm banking module</name>
     <packaging>jar</packaging>
 
