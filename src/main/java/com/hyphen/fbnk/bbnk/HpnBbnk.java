@@ -35,28 +35,29 @@ public class HpnBbnk {
 
     public static void main(String[] args) {
         /*
-        HpnBbnk hpnBbnk = new HpnBbnk();
-        //HpnBbnk hpnBbnk = new HpnBbnk(true);
-        //HpnBbnk hpnBbnk = new HpnBbnk(true, false);
-        //HpnBbnk hpnBbnk = new HpnBbnk(true, "128k", false);
-        //HpnBbnk hpnBbnk = new HpnBbnk("208.181.28.149", "209.181.28.99", 29994, "109.138.30.10", 29995, true, "512k", false);
         for(int i=1 ; i<=1 ;i++){
            new Thread(""+i){
+               //HpnBbnk hpnBbnk = new HpnBbnk();
+               HpnBbnk hpnBbnk = new HpnBbnk(true);
+               //HpnBbnk hpnBbnk = new HpnBbnk(true, false);
+               //HpnBbnk hpnBbnk = new HpnBbnk(true, "128k", false);
+               //HpnBbnk hpnBbnk = new HpnBbnk("208.181.28.149", "209.181.28.99", 29994, "109.138.30.10", 29995, true, "512k", false);
+
                 @Override
                 public void run() {
                     boolean result = false;
                     //송신
-                    result = hpnBbnk.sendData("A00"+getName(),"018"+getName(), "R00", "./snd.txt", "T");
-                    if(result) System.out.println("[thid:"+getName()+"] hpnBbnk.sendData : SUCCESS");
-                    else System.out.println("[thid:"+getName()+"] hpnBbnk.sendData : FAIL");
+                    //result = hpnBbnk.sendData("A00"+getName(),"018"+getName(), "R00", "./snd.txt", "T");
+                    //if(result) System.out.println("[thid:"+getName()+"] hpnBbnk.sendData : SUCCESS");
+                    //else System.out.println("[thid:"+getName()+"] hpnBbnk.sendData : FAIL");
                     //목록조회
                     List<DtoSRList> dtoSRLists = hpnBbnk.recvList("A001", "9999", "ZZZ", "20220308", "20220310", "M", "E", "T");
                     if(dtoSRLists.isEmpty())    System.out.println("[thid:"+getName()+"] hpnBbnk.recvList : NO_DATA");
                     else for (DtoSRList dtoSRList : dtoSRLists)  System.out.println("[thid:"+getName()+"] hpnBbnk.recvList : "+dtoSRList.toString());
                     //수신
-                    result = hpnBbnk.recvData("0081", "A001", "R00", "001", "20220310", "./rcv.txt", "T");
-                    if(result) System.out.println("[thid:"+getName()+"] hpnBbnk.recvData : SUCCESS");
-                    else System.out.println("[thid:"+getName()+"] hpnBbnk.recvData : FAIL");
+                    //result = hpnBbnk.recvData("0081", "A001", "R00", "001", "20220310", "./rcv.txt", "T");
+                    //if(result) System.out.println("[thid:"+getName()+"] hpnBbnk.recvData : SUCCESS");
+                    //else System.out.println("[thid:"+getName()+"] hpnBbnk.recvData : FAIL");
                 }
             }.start();
             try {TimeUnit.SECONDS.sleep(3);} catch (Exception e) {}
@@ -178,7 +179,7 @@ public class HpnBbnk {
      * @return 송수신목록
      */
     public List<DtoSRList> recvList(String finderCd, String targetCd, String infoCd, String fromDt, String toDt, String listTp, String findRng, String runMode){
-        log.debug("[recvList](test2_START) sendCd="+finderCd+", recvCd="+targetCd+", infoCd="+infoCd+", fromDt="+fromDt+", toDt="+toDt+", tpList="+listTp+", runMode="+runMode);
+        log.debug("[recvList](START) sendCd="+finderCd+", recvCd="+targetCd+", infoCd="+infoCd+", fromDt="+fromDt+", toDt="+toDt+", tpList="+listTp+", runMode="+runMode);
 
         String ipAddr   = getUseIpAddr(infoCd, runMode, false);
         int port        = getUsePort(infoCd, runMode, false);

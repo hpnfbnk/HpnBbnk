@@ -36,5 +36,13 @@ public enum MsgCode {
     }
 
     private static final List<MsgCode> MSG_CODE_LIST = Arrays.asList(MsgCode.values());
-    public static MsgCode fromCode(String code){return MSG_CODE_LIST.stream().filter(msgCode -> msgCode.getCode().equals(code.trim())).findFirst().get();}
+    public static MsgCode fromCode(String code){
+        for (MsgCode msgCode : MSG_CODE_LIST) {
+            if (msgCode.getCode().equals(code.trim())) {
+                return msgCode;
+            }
+        }
+        MsgCode empty = null;
+        throw new java.util.NoSuchElementException("No value present");
+    }
 }

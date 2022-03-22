@@ -7,8 +7,14 @@ public final class LogFactory {
     private static Constructor<? extends Log> logConstructor;
 
     static {
-        tryImplementation(LogFactory::useSlf4jLogging);
-        tryImplementation(LogFactory::useNoLogging);
+        tryImplementation(new Runnable() {
+            @Override
+            public void run() {useSlf4jLogging();}
+        });
+        tryImplementation(new Runnable() {
+            @Override
+            public void run() {useNoLogging();}
+        });
     }
 
     private LogFactory(){

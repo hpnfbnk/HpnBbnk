@@ -20,5 +20,13 @@ public enum RtnCode {
     }
 
     private static final List<RtnCode> RTN_CODE_LIST = Arrays.asList(RtnCode.values());
-    public static RtnCode fromCode(String code){return RTN_CODE_LIST.stream().filter(rtnCode -> rtnCode.getCode().equals(code.trim())).findFirst().get();}
+    public static RtnCode fromCode(String code){
+        for (RtnCode rtnCode : RTN_CODE_LIST) {
+            if (rtnCode.getCode().equals(code.trim())) {
+                return rtnCode;
+            }
+        }
+        RtnCode empty = null;
+        throw new java.util.NoSuchElementException("No value present");
+    }
 }

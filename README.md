@@ -2,7 +2,7 @@
 하이픈-배치펌뱅킹서비스용 연동모듈입니다.
 
 ## 요구사항
-JAVA 1.8 이상을 요구합니다.
+JAVA 1.7 이상을 요구합니다.
 
 ## 설치
 [JitPack](https://jitpack.io/#hpnfbnk/HpnBbnk) 을 통해 maven등으로 설치하실수 있습니다.
