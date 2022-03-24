@@ -30,9 +30,9 @@ public class HpnBbnkTest {
         //일반적인 조건으로 수신목록 조회(최근1주일사이에 조회자가 아직 한번도 수신하지 않은 것들에 대한 수신목록 조회요청)
         List<DtoSRList> dtoSRLists = hpnBbnk.getRecvList("A001", "T");
         if(dtoSRLists.isEmpty())
-            System.out.println("hpnBbnk.recvList : NO_DATA");
+            System.out.println("hpnBbnk.getRecvList : NO_DATA");
         else for (DtoSRList dtoSRList : dtoSRLists)
-            System.out.println("hpnBbnk.recvList : "+dtoSRList.toString());
+            System.out.println("hpnBbnk.getRecvList : "+dtoSRList.toString());
         assertNotNull(dtoSRLists);
     }
 
