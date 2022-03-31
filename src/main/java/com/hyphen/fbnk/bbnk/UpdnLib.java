@@ -1,12 +1,11 @@
 package com.hyphen.fbnk.bbnk;
 
-import com.hyphen.fbnk.bbnk.define.Define;
-import com.hyphen.fbnk.bbnk.define.EncTp;
-import com.hyphen.fbnk.bbnk.define.MsgCode;
-import com.hyphen.fbnk.bbnk.define.RtnCode;
+import com.hyphen.fbnk.bbnk.define.*;
+import com.hyphen.fbnk.bbnk.dto.DtoFileList;
 import com.hyphen.fbnk.bbnk.dto.DtoSRList;
 import com.hyphen.fbnk.bbnk.logging.Log;
 import com.hyphen.fbnk.bbnk.logging.LogFactory;
+import com.hyphen.fbnk.bbnk.msg.FnmTpKEduFine;
 import com.hyphen.fbnk.bbnk.msg.MsgNego;
 import com.hyphen.fbnk.bbnk.msg.MsgSRList;
 
@@ -476,9 +475,103 @@ public class UpdnLib {
         return rplyNegoMsg.getRtnCd();
     }
 
+    //송신(한번에 여러개)
+    public List<DtoFileList> sndDataMulti(String ipAddr, int port, String sendCd, List<DtoFileList> fileLists, boolean zipYn, EncTp encTp, String maxBps, FNmTp fNmTp){
+        log.debug("[sndDataMulti] ipAddr="+ipAddr+", port="+port+", sendCd="+sendCd+", fileListCnt="+fileLists.size()+", zipYn="+zipYn+", encTp="+encTp+", maxBps="+maxBps+", fNmTp="+fNmTp.getCode());
 
+        SocketClient sockClnt = null;
+        byte[] sndMsg;
+        try {
+            sockClnt = new SocketClient(ipAddr, port, encTp);
+            sockClnt.connect();
+            if(encTp != EncTp.NONE) sockClnt.setEnc();
+            //개시전문전송
+            sndMsg = new MsgNego(sendCd, Define.HYPHEN.getCode()).getMsgOpenReq();
+            log.trace("[sndDataMulti]    sndMsg=["+new String(sndMsg)+"]("+sndMsg.length+")");
+            sockClnt.writeMsg(sndMsg);
+            //응답전문점검
+            chkRplyMsg(sockClnt, MsgCode.MSG_OPEN_REP);
 
+            //보낼 파일갯수만큼 반복
+            String dInfoCd, dSendCd, dRecvCd;
+            for (DtoFileList fileList : fileLists) {
+                try{
+                    log.debug("[sndDataMulti]("+(fileLists.indexOf(fileList)+1)+"/"+fileLists.size()+") "+fileList);
+                    //사용자정의파일명 처리
+                    if(fNmTp==FNmTp.KEDUFIN){
+                        dInfoCd = fileList.getInfoCd();
+                        dSendCd = getHpnCdKEduFine(sockClnt, fileList);
+                        dRecvCd = "0"+fileList.getRecvCd();
+                    }else{
+                        dInfoCd = fileList.getInfoCd();
+                        dSendCd = fileList.getSendCd();
+                        dRecvCd = fileList.getRecvCd();
+                    }
+                    long fSize = Util.getFileSize(fileList.getFilePath());
+                    //자료송신요청
+                    sndMsg = new MsgNego(dSendCd, dRecvCd).getMsgSendReq(dInfoCd, fSize, zipYn);
+                    log.trace("[sndDataMulti]    sndMsg=["+new String(sndMsg)+"]("+sndMsg.length+")");
+                    sockClnt.writeMsg(sndMsg);
+                    //응답전문점검
+                    chkRplyMsg(sockClnt, MsgCode.MSG_TRANS_REP);
+                    //파일전송
+                    upLoadProcess(sockClnt, dSendCd, dRecvCd, dInfoCd, fileList.getFilePath(), zipYn, maxBps);
+                    //개별종료요청
+                    sndMsg = new MsgNego(dSendCd, dRecvCd).getMsgPartEndReq(dInfoCd, fSize);
+                    log.trace("[sndDataMulti]    sndMsg=["+new String(sndMsg)+"]("+sndMsg.length+")");
+                    sockClnt.writeMsg(sndMsg);
+                    //응답전문점검
+                    chkRplyMsg(sockClnt, MsgCode.MSG_PARTEND_REP);
 
+                    fileList.setRetYn(true);
+                }catch (Exception e) {
+                    log.error(e.toString());
+                    continue;
+                }
+            }
+            //전체종료요청
+            sndMsg = new MsgNego(sendCd, Define.HYPHEN.getCode()).getMsgCloseReq();
+            log.trace("[sndDataMulti]    sndMsg=["+new String(sndMsg)+"]("+sndMsg.length+")");
+            sockClnt.writeMsg(sndMsg);
+            //응답전문점검
+            chkRplyMsg(sockClnt, MsgCode.MSG_CLOSE_REP);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error(e.toString());
+        } finally {
+            if(sockClnt!=null)  sockClnt.close();
+        }
 
+        return fileLists;
+    }
+
+    private String getHpnCdKEduFine(SocketClient sockClnt, DtoFileList fileList) throws Exception {
+        String infoCd = fileList.getInfoCd();
+        String sendCd = FNmTp.KEDUFIN.getCode();
+        String recvCd = "0"+fileList.getRecvCd();
+        //사용자정의파일명 조회
+        FnmTpKEduFine fnmTpKEduFine = new FnmTpKEduFine(new File(fileList.getFilePath()).getName());
+        String fnmInfo = fnmTpKEduFine.getSendCd()+"-"+fnmTpKEduFine.getFacCd();
+        byte[] sndMsg = new MsgNego(sendCd, recvCd).getMsgFindFnmReq(infoCd, MsgCode.MSG_TP_SND_REQ, fnmInfo, FNmTp.KEDUFIN);
+        log.trace("[getHpnCdKEduFine] sndMsg=["+new String(sndMsg)+"]("+sndMsg.length+")");
+        sockClnt.writeMsg(sndMsg);
+
+        byte[] rcvMsg = sockClnt.readMsg();
+        log.trace("[getHpnCdKEduFine] rcvMsg=["+new String(rcvMsg)+"]("+rcvMsg.length+")");
+
+        MsgNego fnmRepMsg = new MsgNego(rcvMsg);
+
+        //log.debug("[getHpnCdKEduFine] RtnCode="+fnmRepMsg.getRtnCd());
+
+        if(fnmRepMsg.getRtnCd() != RtnCode.FINE)
+            throw new Exception("Abnormal RtnCode:["+fnmRepMsg.getRtnCd().getCode()+"]");
+        else if(fnmRepMsg.getMsgType() != MsgCode.MSG_FINDFNM_REP)
+            throw new Exception("[getHpnCdKEduFine] Abnormal MsgType:["+fnmRepMsg.getMsgType().getCode()+"]");
+
+        String hPnCd = fnmRepMsg.getSendCd();
+        log.debug("[getHpnCdKEduFine] fnmInfo="+fnmInfo+" => hPnCd="+hPnCd);
+
+        return hPnCd;
+    }
 
 }

@@ -22,6 +22,8 @@ public enum MsgCode {
     MSG_MISS_REQ    ("0400100"),
     MSG_MISS_REP    ("0420100"),
     MSG_MISS_DATA   ("0410100"),
+    MSG_FINDFNM_REQ ("0500100"),
+    MSG_FINDFNM_REP ("0510100"),
     MSG_PARTEND_REQ ("0800800"),
     MSG_PARTEND_REP ("0810800"),
     MSG_CLOSE_REQ   ("0800900"),
@@ -42,7 +44,8 @@ public enum MsgCode {
                 return msgCode;
             }
         }
-        MsgCode empty = null;
-        throw new java.util.NoSuchElementException("No value present");
+        //MsgCode empty = null;
+        //throw new java.util.NoSuchElementException("[MsgCode.fromCode] code="+code+" No value present");
+        return MsgCode.DEFAULT;
     }
 }

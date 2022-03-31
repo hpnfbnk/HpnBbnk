@@ -1,13 +1,14 @@
 package com.hyphen.fbnk.bbnk;
 
-import com.hyphen.fbnk.bbnk.define.Define;
-import com.hyphen.fbnk.bbnk.define.EncTp;
-import com.hyphen.fbnk.bbnk.define.InfoCdPrf;
-import com.hyphen.fbnk.bbnk.define.MsgCode;
+import com.hyphen.fbnk.bbnk.define.*;
+import com.hyphen.fbnk.bbnk.dto.DtoFileList;
 import com.hyphen.fbnk.bbnk.dto.DtoSRList;
 import com.hyphen.fbnk.bbnk.logging.Log;
 import com.hyphen.fbnk.bbnk.logging.LogFactory;
+import com.hyphen.fbnk.bbnk.msg.FnmTpKEduFine;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -149,6 +150,57 @@ public class HpnBbnk {
         else        log.debug("[sendData](FAIL) sendCd="+sendCd+", recvCd="+recvCd+", infoCd="+infoCd+", filePath="+filePath+", runMode="+runMode);
 
         return result;
+    }
+    
+    /**
+     * Hyphen으로 여러개의 파일 송신
+     * @param sendCd 송신자코드 Hyphen에서 발급한 업체코드
+     * @param sendLists 송신파일 목록
+     * @param sFNmTp 파일명타입 KEDU:k-edufine타입 등..
+     * @param runMode 동작모드 Y:운영 T:test
+     * @return 송신파일 처리결과 목록
+     */
+    public List<DtoFileList> sendDataMulti(String sendCd, List<DtoFileList> sendLists, String sFNmTp, String runMode){
+        List<DtoFileList> prfSendList = new ArrayList<>();
+        List<DtoFileList> nrmSendList = new ArrayList<>();
+        List<DtoFileList> prfResultList, nrmResultList;
+        List<DtoFileList> resultLists = new ArrayList<>();
+
+        for (DtoFileList sendList : sendLists) {
+            log.debug("[sendDataMulti](START) "+sendList+", fNmTp=" + sFNmTp + ", runMode=" + runMode);
+            if(InfoCdPrf.isValue(sendList.getInfoCd())) prfSendList.add(sendList);
+            else nrmSendList.add(sendList);
+        }
+
+        UpdnLib updnLib = new UpdnLib();
+        String ipAddr, repInfoCd;
+        int port;
+        EncTp encTp;
+        //파일명타입
+        FNmTp fNmTp;
+        if(sFNmTp.equals(FNmTp.KEDUFIN.getCode()))  fNmTp = FNmTp.KEDUFIN;
+        else fNmTp = FNmTp.DEFAULT;
+        //증빙
+        if(!prfSendList.isEmpty()){
+            repInfoCd = InfoCdPrf.NML_PRF.getCode();
+            ipAddr  = getUseIpAddr(repInfoCd, runMode, true);
+            port    = getUsePort(repInfoCd, runMode, true);
+            encTp   = getUseEncTp(repInfoCd, true);
+            prfResultList = updnLib.sndDataMulti(ipAddr, port, sendCd, prfSendList, this.zipYn, encTp, this.maxBps, fNmTp);
+            resultLists.addAll(prfResultList);
+        }
+        //일반
+        if(!nrmSendList.isEmpty()){
+            repInfoCd = "R00";
+            ipAddr  = getUseIpAddr(repInfoCd, runMode, true);
+            port    = getUsePort(repInfoCd, runMode, true);
+            encTp   = getUseEncTp(repInfoCd, true);
+            nrmResultList = updnLib.sndDataMulti(ipAddr, port, sendCd, nrmSendList, this.zipYn, encTp, this.maxBps, fNmTp);
+            resultLists.addAll(nrmResultList);
+        }
+        for (DtoFileList resultList : resultLists)  log.debug("[sendDataMulti](RESULT) "+resultList);
+
+        return resultLists;
     }
 
     /**

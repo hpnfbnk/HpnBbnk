@@ -2,6 +2,7 @@ package com.hyphen.fbnk.bbnk.msg;
 
 import com.hyphen.fbnk.bbnk.Util;
 import com.hyphen.fbnk.bbnk.define.Define;
+import com.hyphen.fbnk.bbnk.define.FNmTp;
 import com.hyphen.fbnk.bbnk.define.MsgCode;
 import com.hyphen.fbnk.bbnk.define.RtnCode;
 
@@ -12,29 +13,29 @@ import static java.lang.System.arraycopy;
 public class MsgNego {
     public static final int msgSize = 96;
 
-    private String  fType       = "000";                //3
-    private MsgCode msgType     = MsgCode.DEFAULT;      //7
-    private String  sendCd;                             //10
-    private String  recvCd;                             //10
-    private String  sendTm;                             //12
-    private int     recCnt      = 0;                    //2
-    private int     blockNo     = 0;                    //4
-    private int     seqNo       = 0;                    //3
-    private RtnCode rtnCd       = RtnCode.FINE;         //2
-    private int     recLen      = 0;                    //3
-    private MsgCode srType      = MsgCode.DEFAULT;      //1
-    private int     missCnt     = 0;                    //3
-    private String  fromDate    = "";                   //6
-    private String  toDate      = "";                   //6
-    private MsgCode reqType     = MsgCode.DEFAULT;      //1
-    private String  filler1     = "";                   //10
-    private MsgCode ebcYn       = MsgCode.DEFAULT;      //1
-    private MsgCode encYn       = MsgCode.DEFAULT;      //1
-    private MsgCode zipYn       = MsgCode.DEFAULT;      //1
-    private int     binLen      = 0;                    //4
-    private int     encRem      = 0;                    //1
-    private MsgCode binYn       = MsgCode.MSG_TP_BIN;   //1
-    private String  filler2     = "";                   //4
+    private String fType    = "000";    //3
+    private String msgType  = "";       //7
+    private String sendCd;              //10
+    private String recvCd;              //10
+    private String sendTm;              //12
+    private String recCnt   = "00";     //2
+    private String blockNo  = "0000";   //4
+    private String seqNo    = "000";    //3
+    private String rtnCd    = "";       //2
+    private String recLen   = "000";    //3
+    private String srType   = "";       //1
+    private String missCnt  = "000";    //3
+    private String fromDate = "";       //6
+    private String toDate   = "";       //6
+    private String reqType  ="";        //1
+    private String filler1  = "";       //10
+    private String ebcYn    ="";        //1
+    private String encYn    ="";        //1
+    private String zipYn    ="";        //1
+    private String binLen   = "0000";   //4
+    private String encRem   = "0";      //1
+    private String binYn    = "B";      //1
+    private String filler2  = "";       //4
 
     //4 make msg
     public MsgNego(String sendCd, String recv_cd) {
@@ -46,32 +47,32 @@ public class MsgNego {
     //4 split msg
     public MsgNego(byte[] msg){
         this.fType      = new String(msg, 0, 3);
-        this.msgType    = MsgCode.fromCode(new String(msg, 3, 7));
+        this.msgType    = new String(msg, 3, 7);
         this.sendCd     = new String(msg, 3+7, 10);
         this.recvCd     = new String(msg, 3+7+10, 10);
         this.sendTm     = new String(msg, 3+7+10+10, 12);
-        this.recCnt     = Integer.parseInt("0"+new String(msg, 3+7+10+10+12, 2).trim());
-        this.blockNo    = Integer.parseInt("0"+new String(msg, 3+7+10+10+12+2, 4).trim());
-        this.seqNo      = Integer.parseInt("0"+new String(msg, 3+7+10+10+12+2+4, 3).trim());
-        this.rtnCd      = RtnCode.fromCode(new String(msg, 3+7+10+10+12+2+4+3, 2));
-        this.recLen     = Integer.parseInt("0"+new String(msg, 3+7+10+10+12+2+4+3+2, 3).trim());
-        this.srType     = MsgCode.fromCode(new String(msg, 3+7+10+10+12+2+4+3+2+3, 1));
-        this.missCnt    = Integer.parseInt("0"+new String(msg, 3+7+10+10+12+2+4+3+2+3+1, 3).trim());
+        this.recCnt     = new String(msg, 3+7+10+10+12, 2);
+        this.blockNo    = new String(msg, 3+7+10+10+12+2, 4);
+        this.seqNo      = new String(msg, 3+7+10+10+12+2+4, 3);
+        this.rtnCd      = new String(msg, 3+7+10+10+12+2+4+3, 2);
+        this.recLen     = new String(msg, 3+7+10+10+12+2+4+3+2, 3);
+        this.srType     = new String(msg, 3+7+10+10+12+2+4+3+2+3, 1);
+        this.missCnt    = new String(msg, 3+7+10+10+12+2+4+3+2+3+1, 3);
         this.fromDate   = new String(msg, 3+7+10+10+12+2+4+3+2+3+1+3, 6);
         this.toDate     = new String(msg, 3+7+10+10+12+2+4+3+2+3+1+3+6, 6);
-        this.reqType    = MsgCode.fromCode(new String(msg, 3+7+10+10+12+2+4+3+2+3+1+3+6+6, 1));
+        this.reqType    = new String(msg, 3+7+10+10+12+2+4+3+2+3+1+3+6+6, 1);
         this.filler1    = new String(msg, 3+7+10+10+12+2+4+3+2+3+1+3+6+6+1, 10);
-        this.ebcYn      = MsgCode.fromCode(new String(msg, 3+7+10+10+12+2+4+3+2+3+1+3+6+6+1+10, 1));
-        this.encYn      = MsgCode.fromCode(new String(msg, 3+7+10+10+12+2+4+3+2+3+1+3+6+6+1+10+1, 1));
-        this.zipYn      = MsgCode.fromCode(new String(msg, 3+7+10+10+12+2+4+3+2+3+1+3+6+6+1+10+1+1, 1));
-        this.binLen     = Integer.parseInt("0"+new String(msg, 3+7+10+10+12+2+4+3+2+3+1+3+6+6+1+10+1+1+1, 4).trim());
-        this.encRem     = Integer.parseInt("0"+new String(msg, 3+7+10+10+12+2+4+3+2+3+1+3+6+6+1+10+1+1+1+4, 1).trim());
-        this.binYn      = MsgCode.fromCode(new String(msg, 3+7+10+10+12+2+4+3+2+3+1+3+6+6+1+10+1+1+1+4+1, 1));
+        this.ebcYn      = new String(msg, 3+7+10+10+12+2+4+3+2+3+1+3+6+6+1+10, 1);
+        this.encYn      = new String(msg, 3+7+10+10+12+2+4+3+2+3+1+3+6+6+1+10+1, 1);
+        this.zipYn      = new String(msg, 3+7+10+10+12+2+4+3+2+3+1+3+6+6+1+10+1+1, 1);
+        this.binLen     = new String(msg, 3+7+10+10+12+2+4+3+2+3+1+3+6+6+1+10+1+1+1, 4);
+        this.encRem     = new String(msg, 3+7+10+10+12+2+4+3+2+3+1+3+6+6+1+10+1+1+1+4, 1);
+        this.binYn      = new String(msg, 3+7+10+10+12+2+4+3+2+3+1+3+6+6+1+10+1+1+1+4+1, 1);
         this.filler2    = new String(msg, 3+7+10+10+12+2+4+3+2+3+1+3+6+6+1+10+1+1+1+4+1+1, 4);
     }
 
     public byte[] getMsgOpenReq() throws UnsupportedEncodingException {
-        this.msgType    = MsgCode.MSG_OPEN_REQ;
+        this.msgType    = MsgCode.MSG_OPEN_REQ.getCode();
         this.recvCd     = Define.HYPHEN.getCode();
 
         return getMsg();
@@ -79,34 +80,43 @@ public class MsgNego {
 
     public byte[] getMsgSendReq(String fType, long fSize, boolean zipYn) throws UnsupportedEncodingException {
         this.fType      = fType;
-        this.msgType    = MsgCode.MSG_TRANS_REQ;
-        this.srType     = MsgCode.MSG_TP_SND_REQ;
+        this.msgType    = MsgCode.MSG_TRANS_REQ.getCode();
+        this.srType     = MsgCode.MSG_TP_SND_REQ.getCode();
         this.filler1    = String.format("%010d", fSize);
-        if(zipYn)   this.zipYn = MsgCode.MSG_TP_ZIP;
+        if(zipYn)   this.zipYn = MsgCode.MSG_TP_ZIP.getCode();
 
         return getMsg();
     }
 
+    public byte[] getMsgFindFnmReq(String fType, MsgCode srType, String fnmInfo, FNmTp fNmTp) throws UnsupportedEncodingException {
+        this.fType      = fType;
+        this.msgType    = MsgCode.MSG_FINDFNM_REQ.getCode();
+        this.srType     = srType.getCode();
+        this.fromDate   = fNmTp.getCode();
+
+        return getMsgUseFiller(fnmInfo);
+    }
+
     public byte[] getMsgRecvReq(String fType, String fromDt, String toDt, MsgCode tpReq, MsgCode fRng, String seqNo, boolean zipYn) throws UnsupportedEncodingException {
         this.fType      = fType;
-        this.msgType    = MsgCode.MSG_TRANS_REQ;
-        this.srType     = tpReq;
+        this.msgType    = MsgCode.MSG_TRANS_REQ.getCode();
+        this.srType     = tpReq.getCode();
         this.fromDate   = fromDt;
         this.toDate     = toDt;
-        this.reqType    = fRng;
+        this.reqType    = fRng.getCode();
         this.filler1    = seqNo;
-        if(zipYn)   this.zipYn = MsgCode.MSG_TP_ZIP;
+        if(zipYn)   this.zipYn = MsgCode.MSG_TP_ZIP.getCode();
 
         return getMsg();
     }
 
     public byte[] getMsgSendData(String fType, MsgCode msgType, int blockNo, int seqNo, boolean zipYn, int binLen, byte[] dataBuf) throws UnsupportedEncodingException {
         this.fType      = fType;
-        this.msgType    = msgType;
-        this.blockNo    = blockNo;
-        this.seqNo      = seqNo;
-        if(zipYn)   this.zipYn = MsgCode.MSG_TP_ZIP;
-        this.binLen     = binLen;
+        this.msgType    = msgType.getCode();
+        setBlockNo(blockNo);
+        setSeqNo(seqNo);
+        if(zipYn)   this.zipYn = MsgCode.MSG_TP_ZIP.getCode();
+        setBinLen(binLen);
 
         byte[] sndBuf = new byte[MsgNego.msgSize + binLen];
         arraycopy(getMsg(), 0, sndBuf, 0, MsgNego.msgSize);
@@ -117,30 +127,30 @@ public class MsgNego {
 
     public byte[] getMsgMissReq(String fType, int blockNo, int seqNo) throws UnsupportedEncodingException {
         this.fType      = fType;
-        this.msgType    = MsgCode.MSG_MISS_REQ;
-        this.blockNo    = blockNo;
-        this.seqNo      = seqNo;
+        this.msgType    = MsgCode.MSG_MISS_REQ.getCode();
+        setBlockNo(blockNo);
+        setSeqNo(seqNo);
 
         return getMsg();
     }
 
     public byte[] getMsgPartEndReq(String fType, long fSize) throws UnsupportedEncodingException {
         this.fType = fType;
-        this.msgType    = MsgCode.MSG_PARTEND_REQ;
+        this.msgType    = MsgCode.MSG_PARTEND_REQ.getCode();
         this.filler1 = String.format("%010d", fSize);
 
         return getMsg();
     }
 
     public byte[] getMsgCloseReq() throws UnsupportedEncodingException {
-        this.msgType    = MsgCode.MSG_CLOSE_REQ;
+        this.msgType    = MsgCode.MSG_CLOSE_REQ.getCode();
         this.recvCd     = Define.HYPHEN.getCode();
 
         return getMsg();
     }
 
     public byte[] getMsgMissRep(byte[] missList) throws UnsupportedEncodingException {
-        byte sndBuf[] = new byte[MsgNego.msgSize+missList.length];
+        byte[] sndBuf = new byte[MsgNego.msgSize+missList.length];
         arraycopy(getMsg(), 0, sndBuf, 0, MsgNego.msgSize);
         arraycopy(missList, 0, sndBuf, MsgNego.msgSize, missList.length);
 
@@ -150,46 +160,77 @@ public class MsgNego {
     public byte[] getMsg() throws UnsupportedEncodingException {
         StringBuffer sb = new StringBuffer();
         sb.append(String.format("%-3s", this.fType))
-                .append(String.format("%-7s", this.msgType.getCode()))
+                .append(String.format("%-7s", this.msgType))
                 .append(String.format("%-10s", this.sendCd))
                 .append(String.format("%-10s", this.recvCd))
                 .append(this.sendTm)
-                .append(String.format("%02d", this.recCnt))
-                .append(String.format("%04d", this.blockNo))
-                .append(String.format("%03d", this.seqNo))
-                .append(this.rtnCd.getCode())
-                .append(String.format("%03d", this.recLen))
-                .append(String.format("%-1s", this.srType.getCode()))
-                .append(String.format("%03d", this.missCnt))
+                .append(String.format("%02d", getRecCnt()))
+                .append(String.format("%04d", getBlockNo()))
+                .append(String.format("%03d", getSeqNo()))
+                .append(String.format("%-2s", this.rtnCd))
+                .append(String.format("%03d", getRecLen()))
+                .append(String.format("%-1s", this.srType))
+                .append(String.format("%03d", getMissCnt()))
                 .append(String.format("%-6s", this.fromDate))
                 .append(String.format("%-6s", this.toDate))
-                .append(String.format("%-1s", this.reqType.getCode()))
+                .append(String.format("%-1s", this.reqType))
                 .append(String.format("%-10s", this.filler1))
-                .append(String.format("%-1s", this.ebcYn.getCode()))
-                .append(String.format("%-1s", this.encYn.getCode()))
-                .append(String.format("%-1s", this.zipYn.getCode()))
-                .append(String.format("%04d", this.binLen))
-                .append(String.format("%01d", this.encRem))
-                .append(String.format("%-1s", this.binYn.getCode()))
+                .append(String.format("%-1s", this.ebcYn))
+                .append(String.format("%-1s", this.encYn))
+                .append(String.format("%-1s", this.zipYn))
+                .append(String.format("%04d", getBinLen()))
+                .append(String.format("%01d", getEncRem()))
+                .append(String.format("%-1s", this.binYn))
                 .append(String.format("%-4s", this.filler2));
 
         return sb.toString().getBytes(MsgCode.MSG_ENCODE.getCode());
     }
 
-    public String getfType() {
-        return fType;
-    }
+    public byte[] getMsgUseFiller(String filler19) throws UnsupportedEncodingException {
+        StringBuffer sb = new StringBuffer();
+        sb.append(String.format("%-3s", this.fType))
+                .append(String.format("%-7s", this.msgType))
+                .append(String.format("%-10s", this.sendCd))
+                .append(String.format("%-10s", this.recvCd))
+                .append(this.sendTm)
+                .append(String.format("%02d", getRecCnt()))
+                .append(String.format("%04d", getBlockNo()))
+                .append(String.format("%03d", getSeqNo()))
+                .append(String.format("%-2s", this.rtnCd))
+                .append(String.format("%03d", getRecLen()))
+                .append(String.format("%-1s", this.srType))
+                .append(String.format("%03d", getMissCnt()))
+                .append(String.format("%-6s", this.fromDate))
+                .append(String.format("%-6s", this.toDate))
+                .append(String.format("%-1s", this.reqType))
+                /*
+                .append(String.format("%-10s", this.filler1))
+                .append(String.format("%-1s", this.ebcYn))
+                .append(String.format("%-1s", this.encYn))
+                .append(String.format("%-1s", this.zipYn))
+                .append(String.format("%04d", getBinLen()))
+                .append(String.format("%01d", getEncRem()))
+                .append(String.format("%-1s", this.binYn))
+                 */
+                .append(String.format("%-19s", filler19))
+                .append(String.format("%-4s", this.filler2));
 
-    public void setfType(String fType) {
-        this.fType = fType;
+        return sb.toString().getBytes(MsgCode.MSG_ENCODE.getCode());
     }
 
     public MsgCode getMsgType() {
-        return msgType;
+        //return msgType;
+        return MsgCode.fromCode(this.msgType);
     }
 
     public void setMsgType(MsgCode msgType) {
-        this.msgType = msgType;
+        this.msgType = msgType.getCode();
+    }
+
+    public String getfType() {return fType;}
+
+    public void setfType(String fType) {
+        this.fType = fType;
     }
 
     public String getSendCd() {
@@ -217,59 +258,59 @@ public class MsgNego {
     }
 
     public int getRecCnt() {
-        return recCnt;
+        return Integer.parseInt("0"+this.recCnt.trim());
     }
 
     public void setRecCnt(int recCnt) {
-        this.recCnt = recCnt;
+        this.recCnt = String.format("%02d", recCnt);
     }
 
     public int getBlockNo() {
-        return blockNo;
+        return Integer.parseInt("0"+this.blockNo.trim());
     }
 
     public void setBlockNo(int blockNo) {
-        this.blockNo = blockNo;
+        this.blockNo = String.format("%04d", blockNo);
     }
 
     public int getSeqNo() {
-        return seqNo;
+        return Integer.parseInt("0"+this.seqNo.trim());
     }
 
     public void setSeqNo(int seqNo) {
-        this.seqNo = seqNo;
+        this.seqNo = String.format("%03d", seqNo);
     }
 
     public RtnCode getRtnCd() {
-        return rtnCd;
+        return RtnCode.fromCode(this.rtnCd);
     }
 
     public void setRtnCd(RtnCode rtnCd) {
-        this.rtnCd = rtnCd;
+        this.rtnCd = rtnCd.getCode();
     }
 
     public int getRecLen() {
-        return recLen;
+        return Integer.parseInt("0"+this.recLen.trim());
     }
 
     public void setRecLen(int recLen) {
-        this.recLen = recLen;
+        this.recLen = String.format("%03d", recLen);
     }
 
     public MsgCode getSrType() {
-        return srType;
+        return MsgCode.fromCode(this.srType);
     }
 
     public void setSrType(MsgCode srType) {
-        this.srType = srType;
+        this.srType = srType.getCode();
     }
 
     public int getMissCnt() {
-        return missCnt;
+        return Integer.parseInt("0"+this.missCnt.trim());
     }
 
     public void setMissCnt(int missCnt) {
-        this.missCnt = missCnt;
+        this.missCnt = String.format("%03d", missCnt);
     }
 
     public String getFromDate() {
@@ -289,11 +330,11 @@ public class MsgNego {
     }
 
     public MsgCode getReqType() {
-        return reqType;
+        return MsgCode.fromCode(this.reqType);
     }
 
     public void setReqType(MsgCode reqType) {
-        this.reqType = reqType;
+        this.reqType = reqType.getCode();
     }
 
     public String getFiller1() {
@@ -305,51 +346,51 @@ public class MsgNego {
     }
 
     public MsgCode getEbcYn() {
-        return ebcYn;
+        return MsgCode.fromCode(this.ebcYn);
     }
 
     public void setEbcYn(MsgCode ebcYn) {
-        this.ebcYn = ebcYn;
+        this.ebcYn = ebcYn.getCode();
     }
 
     public MsgCode getEncYn() {
-        return encYn;
+        return MsgCode.fromCode(this.encYn);
     }
 
     public void setEncYn(MsgCode encYn) {
-        this.encYn = encYn;
+        this.encYn = encYn.getCode();
     }
 
     public MsgCode getZipYn() {
-        return zipYn;
+        return MsgCode.fromCode(this.zipYn);
     }
 
     public void setZipYn(MsgCode zipYn) {
-        this.zipYn = zipYn;
+        this.zipYn = zipYn.getCode();
     }
 
     public int getBinLen() {
-        return binLen;
+        return Integer.parseInt("0"+this.binLen.trim());
     }
 
     public void setBinLen(int binLen) {
-        this.binLen = binLen;
+        this.binLen = String.format("%04d", binLen);
     }
 
     public int getEncRem() {
-        return encRem;
+        return Integer.parseInt("0"+this.encRem.trim());
     }
 
     public void setEncRem(int encRem) {
-        this.encRem = encRem;
+        this.encRem = String.format("%01d", encRem);
     }
 
     public MsgCode getBinYn() {
-        return binYn;
+        return MsgCode.fromCode(this.binYn);
     }
 
     public void setBinYn(MsgCode binYn) {
-        this.binYn = binYn;
+        this.binYn = binYn.getCode();
     }
 
     public String getFiller2() {

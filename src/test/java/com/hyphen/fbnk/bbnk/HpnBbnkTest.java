@@ -1,9 +1,11 @@
 package com.hyphen.fbnk.bbnk;
 
+import com.hyphen.fbnk.bbnk.dto.DtoFileList;
 import com.hyphen.fbnk.bbnk.dto.DtoSRList;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -13,7 +15,8 @@ public class HpnBbnkTest {
 
     @Before
     public void setup(){
-        hpnBbnk = new HpnBbnk();
+        this.hpnBbnk = new HpnBbnk();    //기본
+        //this.hpnBbnk = new HpnBbnk(true, false);    //압축
     }
 
     @Test
@@ -55,5 +58,32 @@ public class HpnBbnkTest {
         else System.out.println("hpnBbnk.recvData : FAIL");
         assertTrue(result);
     }
+
+
+    @Test
+    public void sendDataMulti() {
+        List<DtoFileList> sendDataLists = new ArrayList<>();
+        sendDataLists.add(new DtoFileList("20220323", "R00", "A001", "0181", "001", "./sample/ABRQ20220323_B10_011_123456_KB1.001", false));
+        sendDataLists.add(new DtoFileList("20220323", "200", "A002", "0182", "001", "./sample/ABRQ20220323_C10_004_BK123465_KB2.001", false));
+        sendDataLists.add(new DtoFileList("20220323", "Y00", "A001", "0181", "001", "./sample/prf.dat", false));
+
+        List<DtoFileList> resultLists = hpnBbnk.sendDataMulti("A001", sendDataLists, "", "T");
+        for (DtoFileList resultList : resultLists)
+            System.out.println("hpnBbnk.sendDataMulti : "+resultList);
+        assertNotNull(resultLists);
+    }
+
+    @Test
+    public void sendDataMultiKEDU() {
+        List<DtoFileList> sendDataLists = new ArrayList<>();
+        sendDataLists.add(new DtoFileList("20220323", "KB1", "B10", "011", "001", "./sample/ABRQ20220323_B10_011_123456_KB1.001", false));
+        //sendDataLists.add(new DtoFileList("20220323", "KB3", "C10", "004", "001", "./sample/ABRQ20220323_C10_004_BK123465_KB2.001", false));
+
+        List<DtoFileList> resultLists = hpnBbnk.sendDataMulti("KEDU", sendDataLists, "KEDU", "T");
+        for (DtoFileList resultList : resultLists)
+            System.out.println("hpnBbnk.sendDataMultiKEDU : "+resultList);
+        assertNotNull(resultLists);
+    }
+
 
 }
