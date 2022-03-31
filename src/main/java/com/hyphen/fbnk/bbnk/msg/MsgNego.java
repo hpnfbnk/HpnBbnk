@@ -13,29 +13,29 @@ import static java.lang.System.arraycopy;
 public class MsgNego {
     public static final int msgSize = 96;
 
-    private String fType    = "000";    //3
-    private String msgType  = "";       //7
-    private String sendCd;              //10
-    private String recvCd;              //10
-    private String sendTm;              //12
-    private String recCnt   = "00";     //2
-    private String blockNo  = "0000";   //4
-    private String seqNo    = "000";    //3
-    private String rtnCd    = "";       //2
-    private String recLen   = "000";    //3
-    private String srType   = "";       //1
-    private String missCnt  = "000";    //3
-    private String fromDate = "";       //6
-    private String toDate   = "";       //6
-    private String reqType  ="";        //1
-    private String filler1  = "";       //10
-    private String ebcYn    ="";        //1
-    private String encYn    ="";        //1
-    private String zipYn    ="";        //1
-    private String binLen   = "0000";   //4
-    private String encRem   = "0";      //1
-    private String binYn    = "B";      //1
-    private String filler2  = "";       //4
+    private String fType    = "000";                        //3
+    private String msgType  = "";                           //7
+    private String sendCd;                                  //10
+    private String recvCd;                                  //10
+    private String sendTm;                                  //12
+    private String recCnt   = "00";                         //2
+    private String blockNo  = "0000";                       //4
+    private String seqNo    = "000";                        //3
+    private String rtnCd    = RtnCode.FINE.getCode();       //2
+    private String recLen   = "000";                        //3
+    private String srType   = "";                           //1
+    private String missCnt  = "000";                        //3
+    private String fromDate = "";                           //6
+    private String toDate   = "";                           //6
+    private String reqType  ="";                            //1
+    private String filler1  = "";                           //10
+    private String ebcYn    ="";                            //1
+    private String encYn    ="";                            //1
+    private String zipYn    ="";                            //1
+    private String binLen   = "0000";                       //4
+    private String encRem   = "0";                          //1
+    private String binYn    = MsgCode.MSG_TP_BIN.getCode(); //1
+    private String filler2  = "";                           //4
 
     //4 make msg
     public MsgNego(String sendCd, String recv_cd) {

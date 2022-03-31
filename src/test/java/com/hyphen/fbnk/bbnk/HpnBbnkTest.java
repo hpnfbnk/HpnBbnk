@@ -76,8 +76,12 @@ public class HpnBbnkTest {
     @Test
     public void sendDataMultiKEDU() {
         List<DtoFileList> sendDataLists = new ArrayList<>();
-        sendDataLists.add(new DtoFileList("20220323", "KB1", "B10", "011", "001", "./sample/ABRQ20220323_B10_011_123456_KB1.001", false));
-        //sendDataLists.add(new DtoFileList("20220323", "KB3", "C10", "004", "001", "./sample/ABRQ20220323_C10_004_BK123465_KB2.001", false));
+        sendDataLists.add(new DtoFileList("20190323", "KB1", "B10", "011", "001", "./sample/ABRQ20190323_B10_011_123456_KB1.001", false));
+        sendDataLists.add(new DtoFileList("20190323", "KB3", "C10", "004", "001", "./sample/ABRQ20190323_C10_004_BK123456_KB3.001", false));
+        //sendDataLists.add(new DtoFileList("20220331", "KB3", "C10", "004", "001", "./sample/ABRQ20220331_C10_004_BK123456_KB3.001", false));
+        //sendDataLists.add(new DtoFileList("20220331", "KB1", "B10", "011", "001", "./sample/ABRQ20220331_B10_0011_123456_KB1.001", false));
+        //sendDataLists.add(new DtoFileList("20220331", "KB3", "B10", "011", "001", "./sample/ABRQ20220331_B10_0011_123456_KB3.001", false));
+        //sendDataLists.add(new DtoFileList("20220331", "KB3", "B10", "012", "001", "./sample/ABRQ20220331_B10_012_0123401234_KB3.001", false));
 
         List<DtoFileList> resultLists = hpnBbnk.sendDataMulti("KEDU", sendDataLists, "KEDU", "T");
         for (DtoFileList resultList : resultLists)

@@ -560,9 +560,6 @@ public class UpdnLib {
         log.trace("[getHpnCdKEduFine] rcvMsg=["+new String(rcvMsg)+"]("+rcvMsg.length+")");
 
         MsgNego fnmRepMsg = new MsgNego(rcvMsg);
-
-        //log.debug("[getHpnCdKEduFine] RtnCode="+fnmRepMsg.getRtnCd());
-
         if(fnmRepMsg.getRtnCd() != RtnCode.FINE)
             throw new Exception("Abnormal RtnCode:["+fnmRepMsg.getRtnCd().getCode()+"]");
         else if(fnmRepMsg.getMsgType() != MsgCode.MSG_FINDFNM_REP)
