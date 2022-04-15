@@ -2,7 +2,12 @@ package com.hyphen.fbnk.bbnk.msg;
 
 
 public class FnmTpKEduFine {
-    private String charSet;
+    public static final String fFlagReq = "BRQ";
+    public static final String fFlagRep = "BRR";
+    public static final String regRep   = "KB2";
+    public static final String billRep  = "KB4";
+
+    private String charSet = "A";
     private String fileFlag;
     private String sendDt;
     private String sendCd;
@@ -23,21 +28,29 @@ public class FnmTpKEduFine {
         this.fileSeq    = splitList[4].substring(4);
     }
 
-    public FnmTpKEduFine(String charSet, String fileFlag, String sendDt, String sendCd, String recvCd, String facCd, String infoCd, String fileSeq) {
-        this.charSet = charSet;
+    public FnmTpKEduFine(String fileFlag, String sendDt, String sendCd, String recvCd, String facCd, String infoCd, String fileSeq) {
         this.fileFlag = fileFlag;
         this.sendDt = sendDt;
-        this.sendCd = sendCd;
+        this.sendCd = sendCd.substring(1);
         this.recvCd = recvCd;
         this.facCd = facCd;
-        this.infoCd = infoCd;
+        if(infoCd.equals("R00"))        this.infoCd = regRep;
+        else if(infoCd.equals("200"))   this.infoCd = billRep;
+        else this.infoCd = infoCd;
         this.fileSeq = fileSeq;
     }
 
-    public String getFileName(){
+    public String getReqFileName(){
         StringBuilder sb = new StringBuilder();
         sb.append(this.charSet).append(this.fileFlag).append(this.sendDt).append("_").append(this.sendCd).append("_").append(this.recvCd)
                 .append("_").append(this.facCd).append("_").append(this.infoCd).append(".").append(this.fileSeq);
+        return sb.toString();
+    }
+
+    public String getRepFileName(){
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.charSet).append(this.fileFlag).append(this.sendDt).append("_").append(this.sendCd).append("_").append(this.facCd)
+                .append("_").append(this.recvCd).append("_").append(this.infoCd).append(".").append(this.fileSeq);
         return sb.toString();
     }
 

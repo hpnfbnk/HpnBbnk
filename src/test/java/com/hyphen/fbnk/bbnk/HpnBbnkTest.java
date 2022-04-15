@@ -19,7 +19,7 @@ public class HpnBbnkTest {
         //this.hpnBbnk = new HpnBbnk(true, false);    //압축
     }
 
-    @Test
+    //@Test
     public void sendData() {
         //송신
         boolean result = hpnBbnk.sendData("A001","0181", "R00", "./sample/sample_R00_SND.txt", "T");
@@ -39,18 +39,18 @@ public class HpnBbnkTest {
         assertNotNull(dtoSRLists);
     }
 
-    @Test
+    //@Test
     public void recvList() {
         //목록조회
         List<DtoSRList> dtoSRLists = hpnBbnk.recvList("A001", "9999", "ZZZ", "20220310", "20220317", "M", "E", "T");
         if(dtoSRLists.isEmpty())
             System.out.println("hpnBbnk.recvList : NO_DATA");
-        else for (DtoSRList dtoSRList : dtoSRLists)
-            System.out.println("hpnBbnk.recvList : "+dtoSRList.toString());
+        else
+            for (DtoSRList dtoSRList : dtoSRLists) System.out.println("hpnBbnk.recvList : "+dtoSRList.toString());
         assertNotNull(dtoSRLists);
     }
 
-    @Test
+    //@Test
     public void recvData() {
         //수신
         boolean result = hpnBbnk.recvData("0181", "A001", "R00", "001", "20220315", "./sample/sample_R00_RCV.txt", "T");
@@ -60,11 +60,11 @@ public class HpnBbnkTest {
     }
 
 
-    @Test
+    //@Test
     public void sendDataMulti() {
         List<DtoFileList> sendDataLists = new ArrayList<>();
-        sendDataLists.add(new DtoFileList("20220323", "R00", "A001", "0181", "001", "./sample/ABRQ20220323_B10_011_123456_KB1.001", false));
-        sendDataLists.add(new DtoFileList("20220323", "200", "A002", "0182", "001", "./sample/ABRQ20220323_C10_004_BK123465_KB2.001", false));
+        sendDataLists.add(new DtoFileList("20220323", "R00", "A001", "0181", "001", "./sample/ABRQ20190323_B10_011_123456_KB1.001", false));
+        sendDataLists.add(new DtoFileList("20220323", "200", "A002", "0182", "001", "./sample/ABRQ20190323_C10_004_BK123456_KB3.001", false));
         sendDataLists.add(new DtoFileList("20220323", "Y00", "A001", "0181", "001", "./sample/prf.dat", false));
 
         List<DtoFileList> resultLists = hpnBbnk.sendDataMulti("A001", sendDataLists, "", "T");
@@ -73,7 +73,7 @@ public class HpnBbnkTest {
         assertNotNull(resultLists);
     }
 
-    @Test
+    //@Test
     public void sendDataMultiKEDU() {
         List<DtoFileList> sendDataLists = new ArrayList<>();
         sendDataLists.add(new DtoFileList("20190323", "KB1", "B10", "011", "001", "./sample/ABRQ20190323_B10_011_123456_KB1.001", false));
@@ -88,6 +88,27 @@ public class HpnBbnkTest {
             System.out.println("hpnBbnk.sendDataMultiKEDU : "+resultList);
         assertNotNull(resultLists);
     }
+
+    //@Test
+    public void recvDataMulti(){
+        List<DtoFileList> dtoFileLists = hpnBbnk.recvDataMulti("A001", "9999", "ZZZ", "20220315", "20220315", "A", "", "./sample", "T");
+        if(dtoFileLists.isEmpty())
+            System.out.println("hpnBbnk.recvDataMulti : NO_DATA");
+        else
+            for(DtoFileList dtoFileList : dtoFileLists) System.out.println("hpnBbnk.recvDataMulti : "+dtoFileList);
+        assertNotNull(dtoFileLists);
+    }
+
+    //@Test
+    public void recvDataMultiKEDU(){
+        List<DtoFileList> dtoFileLists = hpnBbnk.recvDataMulti("KEDU", "9999", "ZZZ", "20220410", "20220414", "A", "KEDU", "./sample", "T");
+        if(dtoFileLists.isEmpty())
+            System.out.println("hpnBbnk.recvDataMulti : NO_DATA");
+        else
+            for(DtoFileList dtoFileList : dtoFileLists) System.out.println("hpnBbnk.recvDataMulti : "+dtoFileList);
+        assertNotNull(dtoFileLists);
+    }
+
 
 
 }

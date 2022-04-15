@@ -256,6 +256,47 @@ public class HpnBbnk {
     }
 
     /**
+     * Hyphen에서 여러개 파일 수신
+     * @param finderCd 조회자코드
+     * @param targetCd 조회대상자코드 모든대상자:9999)
+     * @param infoCd 조회대상파일종류 모든종류:ZZZ 계좌등록:R00, 자동이체:200, 지급이체(송금):300, 증빙자료:Y00 등..
+     * @param fromDt 조회범위-시작일자 YYYYMMDD
+     * @param toDt 조회범위-종료일자 YYYYMMDD
+     * @param findRng 조회범위-수신여부 미수신건만:E 모두:A
+     * @param sFNmTp 파일명타입 KSNET타입:"", K-edufine타입:KEDU
+     * @param recvDir 수신파일저장 디렉토리
+     * @param runMode 동작모드 Y:운영 T:test
+     * @return 수신파일목록
+     */
+    public List<DtoFileList> recvDataMulti(String finderCd, String targetCd, String infoCd, String fromDt, String toDt, String findRng, String sFNmTp, String recvDir, String runMode){
+        log.debug("[recvDataMulti](START) sendCd="+finderCd+", recvCd="+targetCd+", infoCd="+infoCd+", fromDt="+fromDt+", toDt="+toDt+", findRng="+findRng+", sFNmTp="+sFNmTp+", recvDir="+recvDir+", runMode="+runMode);
+
+        String ipAddr   = getUseIpAddr(infoCd, runMode, false);
+        int port        = getUsePort(infoCd, runMode, false);
+        EncTp encTp     = getUseEncTp(infoCd, false);
+
+        fromDt  = fromDt.length()==8 ? fromDt.substring(2) : fromDt ;
+        toDt    = toDt.length()==8 ? toDt.substring(2) : toDt ;
+        MsgCode fRng    = findRng.equals(MsgCode.MSG_TP_REQ_ALL.getCode()) ? MsgCode.MSG_TP_REQ_ALL : MsgCode.MSG_TP_REQ_YET;
+        //파일명타입
+        FNmTp fNmTp;
+        if(sFNmTp.equals(FNmTp.KEDUFIN.getCode()))  fNmTp = FNmTp.KEDUFIN;
+        else fNmTp = FNmTp.DEFAULT;
+
+        UpdnLib updnLib = new UpdnLib();
+        List<DtoFileList> dtoFileLists = updnLib.rcvDataMulti(ipAddr, port, finderCd, targetCd, infoCd, fromDt, toDt, fRng, fNmTp, recvDir, this.zipYn, encTp);
+
+        if(dtoFileLists.isEmpty())
+            log.debug("[recvDataMulti](NO_DATA) sendCd="+finderCd+", recvCd="+targetCd+", infoCd="+infoCd+", fromDt="+fromDt+", toDt="+toDt+", findRng="+findRng+", runMode="+runMode);
+        else{
+            log.debug("[recvDataMulti](SUCCESS) sendCd="+finderCd+", recvCd="+targetCd+", infoCd="+infoCd+", fromDt="+fromDt+", toDt="+toDt+", findRng="+findRng+", runMode="+runMode);
+            for(DtoFileList dtoFileList : dtoFileLists) log.debug("[recvDataMulti] "+dtoFileList);
+        }
+
+        return dtoFileLists;
+    }
+
+    /**
      * Hyphen에서 결과파일 수신
      * @param sendCd 송신자코드 '0'+3자리은행코드, 하나은행:0081, 농협:0011 등..
      * @param recvCd 수신자코드 Hyphen에서 발급한 업체코드
