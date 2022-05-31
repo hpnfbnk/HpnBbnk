@@ -50,7 +50,7 @@ HpnBbnk hpnBbnk = new HpnBbnk();
 HpnBbnk hpnBbnk = new HpnBbnk(true);
 ```
 
-### 요청파일송신
+### 요청파일 송신
 ```java
 /**
 * Hyphen으로 요청파일 송신
@@ -64,7 +64,7 @@ HpnBbnk hpnBbnk = new HpnBbnk(true);
 boolean result = hpnBbnk.sendData("A001","0081", "R00", "./send.txt", "T");
 ```
 
-### 수신목록조회
+### 수신목록 조회
 ```java
 /**
 * 일반적인 조건으로 수신목록 조회 :
@@ -89,7 +89,7 @@ List<DtoSRList> dtoSRLists = hpnBbnk.getRecvList("A001", "T");
 public DtoSRList(String infoCd, String sendCd, String recvCd, String seqNo, String sendTm, String recvTm, long fileSize)
 ```
 
-### 결과파일수신
+### 결과파일 수신
 ```java
 /**
 * Hyphen에서 결과파일 수신
@@ -103,6 +103,50 @@ public DtoSRList(String infoCd, String sendCd, String recvCd, String seqNo, Stri
 * @return true:성공 false:실패
 */
 boolean result = hpnBbnk.recvData("0081", "A001", "R00", "001", "20220310", "./rcv.txt", "T");
+```
+
+### 여러개파일 송신
+```java
+/**
+* Hyphen으로 여러개의 파일 송신
+* @param sendCd 송신자코드 Hyphen에서 발급한 업체코드
+* @param sendLists 송신파일 목록
+* @param sFNmTp 파일명타입 KEDU:k-edufine타입 등..
+* @param runMode 동작모드 Y:운영 T:test
+* @return 송신파일 처리결과 목록
+*/
+List<DtoFileList> resultLists = hpnBbnk.sendDataMulti("A001", sendDataLists, "", "T");
+```
+```java
+/**
+* 송수신파일목록
+* @param sendDt
+* @param infoCd
+* @param sendCd
+* @param recvCd
+* @param seqNo
+* @param filePath
+* @param retYn
+*/
+public DtoFileList(String sendDt, String infoCd, String sendCd, String recvCd, String seqNo, String filePath, boolean retYn)
+```
+
+### 여러개파일 수신
+```java
+/**
+* Hyphen에서 여러개 파일 수신
+* @param finderCd 조회자코드
+* @param targetCd 조회대상자코드 모든대상자:9999)
+* @param infoCd 조회대상파일종류 모든종류:ZZZ 계좌등록:R00, 자동이체:200, 지급이체(송금):300, 증빙자료:Y00 등..
+* @param fromDt 조회범위-시작일자 YYYYMMDD
+* @param toDt 조회범위-종료일자 YYYYMMDD
+* @param findRng 조회범위-수신여부 미수신건만:E 모두:A
+* @param sFNmTp 파일명타입 KSNET타입:"", K-edufine타입:KEDU
+* @param recvDir 수신파일저장 디렉토리
+* @param runMode 동작모드 Y:운영 T:test
+* @return 수신파일목록
+*/
+List<DtoFileList> dtoFileLists = hpnBbnk.recvDataMulti("A001", "9999", "ZZZ", "20220315", "20220315", "A", "", "./sample", "T");
 ```
 
 * 보다 자세한 내용은 첨부된 [javadoc](https://hpnfbnk.github.io/HpnBbnk/javadoc/) 에 설명되어 있습니다.
