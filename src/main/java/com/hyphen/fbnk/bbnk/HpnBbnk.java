@@ -8,6 +8,9 @@ import com.hyphen.fbnk.bbnk.logging.LogFactory;
 import com.hyphen.fbnk.bbnk.msg.FnmTpKEduFine;
 
 import java.io.File;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -325,6 +328,118 @@ public class HpnBbnk {
         else        log.debug("[recvData](FAIL) sendDt="+sendDt+", sendCd="+sendCd+", recvCd="+recvCd+", infoCd="+infoCd+", seqNo="+seqNo+", filePath="+filePath+", runMode="+runMode);
 
         return result;
+    }
+
+    /**
+     * @param filePath 처리대상파일 위치
+     * @param infoCd 파일종류구분코드 C01:법인카드-승인내역, C02:법인카드-매입, C03:법인카드-청구, C04:법인카드-카드기본정보, C05:법인카드-결재정보, C06:법인카드-한도정보
+     * @param dbDriver JDBC Driver
+     * @param dbUrl JDBC Url
+     * @param dbUser DB user id
+     * @param dbPass DB user password
+     * @return true:성공 false:실패
+     */
+    public boolean set2DB(String filePath, String infoCd, String dbDriver, String dbUrl, String dbUser, String dbPass){
+        boolean result = false;
+        ProcBbdata procBbdata = new ProcBbdata();
+        result = procBbdata.corpCard2DB(filePath, infoCd, dbDriver, dbUrl, dbUser, dbPass);
+
+        if(result)  log.debug("[set2DB](SUCCESS) filePath:"+filePath+", infoCd:"+infoCd);
+        else        log.debug("[set2DB](FAIL) filePath:"+filePath+", infoCd:"+infoCd);
+
+        return result;
+    }
+
+    /**
+     * Hyphen에서 결과파일 수신하여 DB에 insert (법인카드사용내역에 한하여..)
+     * @param sendCd 송신자코드 '0'+3자리은행코드, 하나은행:0081, 농협:0011 등..
+     * @param recvCd 수신자코드 Hyphen에서 발급한 업체코드
+     * @param infoCd 파일종류구분코드 C01:법인카드-승인내역, C02:법인카드-매입, C03:법인카드-청구, C04:법인카드-카드기본정보, C05:법인카드-결재정보, C06:법인카드-한도정보
+     * @param seqNo 파일순번
+     * @param sendDt 송신일자
+     * @param filePath 수신대상파일 저장위치
+     * @param runMode 동작모드 Y:운영 T:test
+     * @param dbDriver JDBC Driver
+     * @param dbUrl JDBC Url
+     * @param dbUser DB user id
+     * @param dbPass DB user password
+     * @return true:성공 false:실패
+     */
+    public boolean recvData2DB(String sendCd, String recvCd, String infoCd, String seqNo, String sendDt, String filePath, String runMode, String dbDriver, String dbUrl, String dbUser, String dbPass){
+        boolean result = false;
+        log.debug("[recvData2DB](START) sendCd="+sendCd+", recvCd="+recvCd+", infoCd="+infoCd+", seqNo="+seqNo+", sendDt="+sendDt+", filePath="+filePath+", runMode="+runMode);
+
+        if(!infoCd.substring(0,2).equals("C0")){
+            log.error("[recvData2DB] Undefined infoCd : "+infoCd);
+            return false;
+        }
+        String ipAddr   = getUseIpAddr(infoCd, runMode, false);
+        int port        = getUsePort(infoCd, runMode, false);
+        EncTp encTp     = getUseEncTp(infoCd, false);
+
+        sendDt  = sendDt.length()==8 ? sendDt.substring(2) : sendDt ;
+        sendDt  = sendDt.length()==14 ? sendDt.substring(2, 8) : sendDt ;
+        UpdnLib updnLib = new UpdnLib();
+        result = updnLib.rcvData(ipAddr, port, sendCd, recvCd, infoCd, seqNo, sendDt, filePath, this.zipYn, encTp);
+        if(result)  log.debug("[recvData2DB](SUCCESS) sendDt="+sendDt+", sendCd="+sendCd+", recvCd="+recvCd+", infoCd="+infoCd+", seqNo="+seqNo+", filePath="+filePath+", runMode="+runMode);
+        else        log.debug("[recvData2DB](FAIL) sendDt="+sendDt+", sendCd="+sendCd+", recvCd="+recvCd+", infoCd="+infoCd+", seqNo="+seqNo+", filePath="+filePath+", runMode="+runMode);
+
+        ProcBbdata procBbdata = new ProcBbdata();
+        result = procBbdata.corpCard2DB(filePath, infoCd, dbDriver, dbUrl, dbUser, dbPass);
+
+        return result;
+    }
+
+    /**
+     * Hyphen에서 여러개 파일 수신하여 DB에 insert (법인카드사용내역에 한하여..)
+     * @param finderCd 조회자코드
+     * @param targetCd 조회대상자코드 모든대상자:9999)
+     * @param infoCd 조회대상파일종류 모든종류:ZZZ 계좌등록:R00, 자동이체:200, 지급이체(송금):300, 증빙자료:Y00 등..
+     * @param fromDt 조회범위-시작일자 YYYYMMDD
+     * @param toDt 조회범위-종료일자 YYYYMMDD
+     * @param findRng 조회범위-수신여부 미수신건만:E 모두:A
+     * @param sFNmTp 파일명타입 KSNET타입:"", K-edufine타입:KEDU
+     * @param recvDir 수신파일저장 디렉토리
+     * @param runMode 동작모드 Y:운영 T:test
+     * @param dbDriver JDBC Driver
+     * @param dbUrl JDBC Url
+     * @param dbUser DB user id
+     * @param dbPass DB user password
+     * @return 수신처리결과목록
+     */
+    public List<DtoFileList> recvDataMulti2DB(String finderCd, String targetCd, String infoCd, String fromDt, String toDt, String findRng, String sFNmTp, String recvDir, String runMode, String dbDriver, String dbUrl, String dbUser, String dbPass) {
+        log.debug("[recvDataMulti2DB](START) sendCd=" + finderCd + ", recvCd=" + targetCd + ", infoCd=" + infoCd + ", fromDt=" + fromDt + ", toDt=" + toDt + ", findRng=" + findRng + ", sFNmTp=" + sFNmTp + ", recvDir=" + recvDir + ", runMode=" + runMode);
+
+        String ipAddr   = getUseIpAddr(infoCd, runMode, false);
+        int port        = getUsePort(infoCd, runMode, false);
+        EncTp encTp     = getUseEncTp(infoCd, false);
+
+        fromDt  = fromDt.length()==8 ? fromDt.substring(2) : fromDt ;
+        toDt    = toDt.length()==8 ? toDt.substring(2) : toDt ;
+        MsgCode fRng    = findRng.equals(MsgCode.MSG_TP_REQ_ALL.getCode()) ? MsgCode.MSG_TP_REQ_ALL : MsgCode.MSG_TP_REQ_YET;
+        //파일명타입
+        FNmTp fNmTp;
+        if(sFNmTp.equals(FNmTp.KEDUFIN.getCode()))  fNmTp = FNmTp.KEDUFIN;
+        else fNmTp = FNmTp.DEFAULT;
+
+        UpdnLib updnLib = new UpdnLib();
+        List<DtoFileList> dtoFileLists = updnLib.rcvDataMulti(ipAddr, port, finderCd, targetCd, infoCd, fromDt, toDt, fRng, fNmTp, recvDir, this.zipYn, encTp);
+
+        ProcBbdata procBbdata = new ProcBbdata();
+        boolean dbResult = false;
+        if(dtoFileLists.isEmpty())
+            log.debug("[recvDataMulti2DB](NO_DATA) sendCd="+finderCd+", recvCd="+targetCd+", infoCd="+infoCd+", fromDt="+fromDt+", toDt="+toDt+", findRng="+findRng+", runMode="+runMode);
+        else{
+            log.debug("[recvDataMulti2DB](SUCCESS) sendCd="+finderCd+", recvCd="+targetCd+", infoCd="+infoCd+", fromDt="+fromDt+", toDt="+toDt+", findRng="+findRng+", runMode="+runMode);
+
+            for(DtoFileList dtoFileList : dtoFileLists){
+                dbResult = procBbdata.corpCard2DB(dtoFileList.getFilePath(), dtoFileList.getInfoCd(), dbDriver, dbUrl, dbUser, dbPass);
+                dtoFileList.setRetYn(dbResult);
+                log.debug("[recvDataMulti2DB] "+dtoFileList);
+            }
+        }
+
+        return dtoFileLists;
     }
 
     private String getUseIpAddr(String infoCd, String runMode, boolean sndYn){

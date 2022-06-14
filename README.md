@@ -22,7 +22,7 @@ pom.xml에 아래 내용을 추가해주시면 됩니다.
 <dependency>
     <groupId>com.github.hpnfbnk</groupId>
     <artifactId>HpnBbnk</artifactId>
-    <version>1.1.0</version>
+    <version>1.2.0</version>
 </dependency>
 ```
 
@@ -149,6 +149,48 @@ public DtoFileList(String sendDt, String infoCd, String sendCd, String recvCd, S
 List<DtoFileList> dtoFileLists = hpnBbnk.recvDataMulti("A001", "9999", "ZZZ", "20220315", "20220315", "A", "", "./sample", "T");
 ```
 
+### 파일 수신하여 DB에 insert (법인카드사용내역에 한해..)
+```java
+/**
+* Hyphen에서 결과파일 수신하여 DB에 insert (법인카드사용내역에 한하여..)
+* @param sendCd 송신자코드 '0'+3자리은행코드, 하나은행:0081, 농협:0011 등..
+* @param recvCd 수신자코드 Hyphen에서 발급한 업체코드
+* @param infoCd 파일종류구분코드 C01:법인카드-승인내역, C02:법인카드-매입, C03:법인카드-청구, C04:법인카드-카드기본정보, C05:법인카드-결재정보, C06:법인카드-한도정보
+* @param seqNo 파일순번
+* @param sendDt 송신일자
+* @param filePath 수신대상파일 저장위치
+* @param runMode 동작모드 Y:운영 T:test
+* @param dbDriver JDBC Driver
+* @param dbUrl JDBC Url
+* @param dbUser DB user id
+* @param dbPass DB user password
+* @return true:성공 false:실패
+*/
+boolean result = hpnBbnk.recvData2DB(sendCd, recvCd, infoCd, seqNo, sendDt, filePath, runMode, dbDriver, dbUrl, dbUser, dbPass);
+```
+
+### 여러개 파일 수신하여 DB에 insert (법인카드사용내역에 한해..)
+```java
+/**
+* Hyphen에서 여러개 파일 수신하여 DB에 insert (법인카드사용내역에 한하여..)
+* @param finderCd 조회자코드
+* @param targetCd 조회대상자코드 모든대상자:9999)
+* @param infoCd 조회대상파일종류 모든종류:ZZZ 계좌등록:R00, 자동이체:200, 지급이체(송금):300, 증빙자료:Y00 등..
+* @param fromDt 조회범위-시작일자 YYYYMMDD
+* @param toDt 조회범위-종료일자 YYYYMMDD
+* @param findRng 조회범위-수신여부 미수신건만:E 모두:A
+* @param sFNmTp 파일명타입 KSNET타입:"", K-edufine타입:KEDU
+* @param recvDir 수신파일저장 디렉토리
+* @param runMode 동작모드 Y:운영 T:test
+* @param dbDriver JDBC Driver
+* @param dbUrl JDBC Url
+* @param dbUser DB user id
+* @param dbPass DB user password
+* @return 수신처리결과목록
+*/
+List<DtoFileList> dtoFileLists = hpnBbnk.recvDataMulti2DB(recvCd, sendCd, infoCd, sendDt, sendDt, "E", "", "./sample", runMode, dbDriver, dbUrl, dbUser, dbPass);
+```
+
 * 보다 자세한 내용은 첨부된 [javadoc](https://hpnfbnk.github.io/HpnBbnk/javadoc/) 에 설명되어 있습니다.
 
 ## 예제
@@ -165,3 +207,4 @@ List<DtoFileList> dtoFileLists = hpnBbnk.recvDataMulti("A001", "9999", "ZZZ", "2
 - [HYPHEN펌뱅킹_파일종류구분코드표.xlsx](https://hpnfbnk.github.io/HpnBbnk/HYPHEN펌뱅킹_파일종류구분코드표.xlsx) : 파일종류구분표
 - [배치펌뱅킹_오류코드정리.xlsx](https://hpnfbnk.github.io/HpnBbnk/배치펌뱅킹_오류코드정리.xlsx) : 오류코드표
 - [HYPHEN_Tcp송수신전문내역서.xls](https://hpnfbnk.github.io/HpnBbnk/HYPHEN_Tcp송수신전문내역서.xls) : 전문상세내역서
+- [HYPHEN-배치펌뱅킹서비스용 연동Demon모듈](https://hpnfbnk.github.io/HpnBbnkDemon/HpnBbnkDemon.tar.gz) : 주기적으로 반복 동작해 송수신을 자동으로 하는 독립적인 데몬형태모듈입니다.

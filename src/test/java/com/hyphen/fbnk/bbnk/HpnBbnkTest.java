@@ -28,7 +28,7 @@ public class HpnBbnkTest {
         assertTrue(result);
     }
 
-    @Test
+    //@Test
     public void getRecvList() {
         //일반적인 조건으로 수신목록 조회(최근1주일사이에 조회자가 아직 한번도 수신하지 않은 것들에 대한 수신목록 조회요청)
         List<DtoSRList> dtoSRLists = hpnBbnk.getRecvList("A001", "T");
@@ -58,7 +58,6 @@ public class HpnBbnkTest {
         else System.out.println("hpnBbnk.recvData : FAIL");
         assertTrue(result);
     }
-
 
     //@Test
     public void sendDataMulti() {
@@ -109,6 +108,53 @@ public class HpnBbnkTest {
         assertNotNull(dtoFileLists);
     }
 
+    //@Test
+    public void recvDataDB(){
+        String filePath = "./sample/CocaC01.001";
+        String infoCd = "C01";
+        String dbDriver = "org.gjt.mm.mysql.Driver";
+        String dbUrl = "jdbc:mysql://localhost:3306/test";
+        String dbUser = "myid";
+        String dbPass = "mypwd";
+        boolean result = hpnBbnk.set2DB(filePath, infoCd, dbDriver, dbUrl, dbUser, dbPass);
+        assertTrue(result);
+    }
+
+    //@Test
+    public void recvData2DB(){
+        String sendCd   = "1096";
+        String recvCd   = "A001";
+        String infoCd   = "C01";
+        String seqNo    = "001";
+        String sendDt   = "20220510";
+        String filePath = "./sample/"+infoCd+sendCd+recvCd+".txt";
+        String runMode  = "T";
+        String dbDriver = "org.gjt.mm.mysql.Driver";
+        String dbUrl = "jdbc:mysql://localhost:3306/test?serverTimezone=Asia/Seoul&useSSL=false";
+        String dbUser = "myid";
+        String dbPass = "mypwd";
+        boolean result = hpnBbnk.recvData2DB(sendCd, recvCd, infoCd, seqNo, sendDt, filePath, runMode, dbDriver, dbUrl, dbUser, dbPass);
+        assertTrue(result);
+    }
+
+    //@Test
+    public void recvDataMulti2DB(){
+        String sendCd   = "9999";
+        String recvCd   = "A001";
+        String infoCd   = "ZZZ";
+        String sendDt   = "20220510";
+        String runMode  = "T";
+        String dbDriver = "org.gjt.mm.mysql.Driver";
+        String dbUrl = "jdbc:mysql://localhost:3306/test";
+        String dbUser = "myid";
+        String dbPass = "mypwd";
+        List<DtoFileList> dtoFileLists = hpnBbnk.recvDataMulti2DB(recvCd, sendCd, infoCd, sendDt, sendDt, "E", "", "./sample", runMode, dbDriver, dbUrl, dbUser, dbPass);
+        if(dtoFileLists.isEmpty())
+            System.out.println("hpnBbnk.recvDataMulti2DB : NO_DATA");
+        else
+            for(DtoFileList dtoFileList : dtoFileLists) System.out.println("hpnBbnk.recvDataMulti2DB : "+dtoFileList);
+        assertNotNull(dtoFileLists);
+    }
 
 
 }
