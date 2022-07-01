@@ -1,19 +1,17 @@
 package com.hyphen.fbnk.bbnk;
 
 import com.hyphen.fbnk.bbnk.define.*;
-import com.hyphen.fbnk.bbnk.dto.DtoFileList;
-import com.hyphen.fbnk.bbnk.dto.DtoSRList;
+import com.hyphen.fbnk.bbnk.dto.*;
 import com.hyphen.fbnk.bbnk.logging.Log;
 import com.hyphen.fbnk.bbnk.logging.LogFactory;
-import com.hyphen.fbnk.bbnk.msg.FnmTpKEduFine;
+import com.hyphen.fbnk.bbnk.msg.FfmBillCom;
+import com.hyphen.fbnk.bbnk.msg.FfmPayCom;
+import com.hyphen.fbnk.bbnk.msg.FfmRegCom;
+import com.hyphen.fbnk.bbnk.msg.FnmTpKsnet;
 
 import java.io.File;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class HpnBbnk {
     //default setting
@@ -440,6 +438,172 @@ public class HpnBbnk {
         }
 
         return dtoFileLists;
+    }
+
+    /**
+     * Dto 리스트를 받아 요청파일로 생성
+     * @param infoCd 파일종류구분코드 계좌등록:R00(I0R), 자동이체:200(I02), 지급이체(송금):300(I03) 등..
+     * @param dtoList Dto리스트 계좌등록:DtoReg, 자동이체:DtoBill, 지급이체:DtoPay 등..
+     * @param desFilePath 요청파일저장경로
+     * @return true:성공 false:실패
+     */
+    public boolean makeDataFile(String infoCd, List<?> dtoList, String desFilePath){
+        boolean result = false;
+
+        if(dtoList.isEmpty()){
+            log.error("[makeDataFile] dtoList is Empty~!!");
+            return false;
+        }
+        log.debug("[makeDataFile] infoCd="+infoCd+", dto="+dtoList.get(0).getClass()+", desFilePath="+desFilePath);
+
+        switch (infoCd) {
+            case "R00":
+            case "I0R":
+                //dtoList type 점검
+                if (!(dtoList.get(0) instanceof DtoReg)) {
+                    log.error("[makeDataFile] incorrect dtoList~!!");
+                    return false;
+                }
+                List<DtoReg> dtoRegList = new ArrayList<>();
+                for (Object dto : dtoList) dtoRegList.add((DtoReg) dto);
+                FfmRegCom ffmRegCom = new FfmRegCom();
+                result = ffmRegCom.makeFile(dtoRegList, desFilePath);
+                break;
+            case "200":
+            case "I02":
+                if (!(dtoList.get(0) instanceof DtoBill)) {
+                    log.error("[makeDataFile] incorrect dtoList~!!");
+                    return false;
+                }
+                List<DtoBill> dtoBillList = new ArrayList<>();
+                for (Object dto : dtoList) dtoBillList.add((DtoBill) dto);
+                FfmBillCom ffmBillCom = new FfmBillCom();
+                result = ffmBillCom.makeFile(dtoBillList, desFilePath);
+                break;
+            case "300":
+            case "I03":
+                if (!(dtoList.get(0) instanceof DtoPay)) {
+                    log.error("[makeDataFile] incorrect dtoList~!!");
+                    return false;
+                }
+                List<DtoPay> dtoPayList = new ArrayList<>();
+                for (Object dto : dtoList) dtoPayList.add((DtoPay) dto);
+                FfmPayCom ffmPayCom = new FfmPayCom();
+                result = ffmPayCom.makeFile(dtoPayList, desFilePath);
+                break;
+        }
+
+        return result;
+    }
+
+    /**
+     * Dto 리스트를 받아 요청파일로 생성하여 HYPHEN으로 송신
+     * @param sendCd sendCd 송신자코드 Hyphen에서 발급한 업체코드
+     * @param recvCd recvCd 수신자코드 '0'+3자리은행코드, 하나은행:0081, 농협:0011 등..
+     * @param infoCd 파일종류구분코드 계좌등록:R00(I0R), 자동이체:200(I03), 지급이체(송금):300(I03) 등..
+     * @param dtoList Dto리스트 계좌등록:DtoReg, 자동이체:DtoBill 등..
+     * @param saveDir 생성돤파일 저장할 디렉토리
+     * @param runMode 동작모드 Y:운영 T:test
+     * @return true:성공 false:실패
+     */
+    public boolean sendDataDto(String sendCd, String recvCd, String infoCd, List<?> dtoList, String saveDir, String runMode){
+        boolean result = false;
+        log.debug("[sendDataDto](START) sendCd="+sendCd+", recvCd="+recvCd+", infoCd="+infoCd+", saveDir="+saveDir+", runMode="+runMode);
+        //저장파일경로 조립
+        int saveFileSeq = 1;
+        FnmTpKsnet fnmTpKsnet = new FnmTpKsnet(FnmTpKsnet.fFlagReq, Util.getCurDtTm().substring(0, 8), sendCd, recvCd, infoCd, String.format("%03d", saveFileSeq));
+        String saveFilePath = saveDir+"/"+fnmTpKsnet.getFileName();
+        StringBuilder sb = new StringBuilder(saveFilePath);
+        for(int i=0 ; i<999 ; i++){
+            if(new File(saveFilePath).exists()) saveFilePath = sb.replace(saveFilePath.length()-3, saveFilePath.length(), String.format("%03d", ++saveFileSeq)).toString();
+            else break;
+        }
+        //파일생성
+        if(!makeDataFile(infoCd, dtoList, saveFilePath)){
+            log.debug("[sendDataDto](FAIL) ERROR makeDataFile()~!!");
+            return false;
+        }
+
+        String ipAddr   = getUseIpAddr(infoCd, runMode, true);
+        int port        = getUsePort(infoCd, runMode, true);
+        EncTp encTp     = getUseEncTp(infoCd, true);
+
+        UpdnLib updnLib = new UpdnLib();
+        result = updnLib.sndData(ipAddr, port, sendCd, recvCd, infoCd, saveFilePath, this.zipYn, encTp, this.maxBps);
+
+        if(result)  log.debug("[sendDataDto](SUCCESS) sendCd="+sendCd+", recvCd="+recvCd+", infoCd="+infoCd+", saveFilePath="+saveFilePath+", runMode="+runMode);
+        else        log.debug("[sendDataDto](FAIL) sendCd="+sendCd+", recvCd="+recvCd+", infoCd="+infoCd+", saveFilePath="+saveFilePath+", runMode="+runMode);
+
+        return result;
+    }
+
+    /**
+     * 결과파일을 Dto 리스트로 변환
+     * @param infoCd 파일종류구분코드 계좌등록:R00(I0R), 자동이체:200(I03), 지급이체(송금):300(I03) 등..
+     * @param srcFilePath 결과파일위치
+     * @return Dto리스트 계좌등록:DtoReg, 자동이체:DtoBill 등..
+     */
+    public List<?> makeDtoList(String infoCd, String srcFilePath){
+        List<?> dtoList = null ;
+        switch (infoCd) {
+            case "R00":
+            case "I0R":
+                FfmRegCom regCom = new FfmRegCom();
+                dtoList = regCom.makeDtoList(srcFilePath);
+                break;
+            case "200":
+            case "I02":
+                FfmBillCom billCom = new FfmBillCom();
+                dtoList = billCom.makeDtoList(srcFilePath);
+                break;
+            case "300":
+            case "I03":
+                FfmPayCom payCom = new FfmPayCom();
+                dtoList = payCom.makeDtoList(srcFilePath);
+                break;
+        }
+
+        return dtoList;
+    }
+
+    /**
+     * Hyphen에서 결과파일 수신하여 Dto 리스트로 변환
+     * @param sendCd 송신자코드 '0'+3자리은행코드, 하나은행:0081, 농협:0011 등..
+     * @param recvCd 수신자코드 Hyphen에서 발급한 업체코드
+     * @param infoCd 파일종류구분코드 계좌등록:R00(I0R), 자동이체:200(I03), 지급이체(송금):300(I03) 등..
+     * @param seqNo 파일순번
+     * @param sendDt 송신일자
+     * @param saveDir 수신파일보관경로
+     * @param runMode runMode 동작모드 Y:운영 T:test
+     * @return Dto리스트 계좌등록:DtoReg, 자동이체:DtoBill 등..
+     */
+    public List<?> recvDataDto(String sendCd, String recvCd, String infoCd, String seqNo, String sendDt, String saveDir, String runMode){
+        log.debug("[recvDataDto](START) sendCd="+sendCd+", recvCd="+recvCd+", infoCd="+infoCd+", seqNo="+seqNo+", sendDt="+sendDt+", saveDir="+saveDir+", runMode="+runMode);
+
+        String ipAddr   = getUseIpAddr(infoCd, runMode, false);
+        int port        = getUsePort(infoCd, runMode, false);
+        EncTp encTp     = getUseEncTp(infoCd, false);
+        sendDt  = sendDt.length()==8 ? sendDt.substring(2) : sendDt ;
+        sendDt  = sendDt.length()==14 ? sendDt.substring(2, 8) : sendDt ;
+        //수신파일명조립
+        int saveFileSeq = 1;
+        FnmTpKsnet fnmTpKsnet = new FnmTpKsnet(FnmTpKsnet.fFlagRep, Util.getCurDtTm().substring(0, 8), sendCd, recvCd, infoCd, String.format("%03d", saveFileSeq));
+        String saveFilePath = saveDir+"/"+fnmTpKsnet.getFileName();
+        StringBuilder sb = new StringBuilder(saveFilePath);
+        for(int i=0 ; i<999 ; i++){
+            if(new File(saveFilePath).exists()) saveFilePath = sb.replace(saveFilePath.length()-3, saveFilePath.length(), String.format("%03d", ++saveFileSeq)).toString();
+            else break;
+        }
+
+        UpdnLib updnLib = new UpdnLib();
+        boolean result = updnLib.rcvData(ipAddr, port, sendCd, recvCd, infoCd, seqNo, sendDt, saveFilePath, this.zipYn, encTp);
+        if(result)  log.debug("[recvDataDto](SUCCESS) sendDt="+sendDt+", sendCd="+sendCd+", recvCd="+recvCd+", infoCd="+infoCd+", seqNo="+seqNo+", saveFilePath="+saveFilePath+", runMode="+runMode);
+        else{
+            log.debug("[recvDataDto](FAIL) sendDt="+sendDt+", sendCd="+sendCd+", recvCd="+recvCd+", infoCd="+infoCd+", seqNo="+seqNo+", saveFilePath="+saveFilePath+", runMode="+runMode);
+            return null;
+        }
+
+        return makeDtoList(infoCd, saveFilePath);
     }
 
     private String getUseIpAddr(String infoCd, String runMode, boolean sndYn){

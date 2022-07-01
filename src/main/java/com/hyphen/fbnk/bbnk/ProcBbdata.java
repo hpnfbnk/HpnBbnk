@@ -3,6 +3,7 @@ package com.hyphen.fbnk.bbnk;
 import com.hyphen.fbnk.bbnk.dto.*;
 import com.hyphen.fbnk.bbnk.logging.Log;
 import com.hyphen.fbnk.bbnk.logging.LogFactory;
+import com.hyphen.fbnk.bbnk.msg.FfmRegCom;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -12,10 +13,11 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 
-public class ProcBbdata  
-{
+public class ProcBbdata {
     private static final Log log = LogFactory.getLog(ProcBbdata.class);
 	private final String TBL_C01 = "COCA_APPR";
 	private final String TBL_C02 = "COCA_ACQU";
@@ -63,7 +65,8 @@ public class ProcBbdata
 
 		return result;
 	}
-	
+
+	/*
 	private byte[] readLineByte(FileInputStream fis) throws IOException{
 		byte[] tmpByte = new byte[1024*2];
 		int iByte = 0, byteCnt = 0;
@@ -82,6 +85,7 @@ public class ProcBbdata
 		
 		return resultByte;
 	}
+	 */
 	
 	private boolean Approval2DB(String file_path, Connection db_con) {
 		boolean result = true;
@@ -105,7 +109,7 @@ public class ProcBbdata
 			fis = new FileInputStream(file_path);
 			while(true) {
 				i_cnt++;
-				dataBuf = readLineByte(fis);
+				dataBuf = Util.readLineByte(fis);
 				if(dataBuf.length==0)	break;
 				if(!new String(dataBuf, 0, 1).equals("D"))	continue;
 				
@@ -217,7 +221,7 @@ public class ProcBbdata
 			fis = new FileInputStream(file_path);
 			while(true) {
 				i_cnt++;
-				dataBuf = readLineByte(fis);
+				dataBuf = Util.readLineByte(fis);
 				if(dataBuf.length==0)	break;
 				if(!new String(dataBuf, 0, 1).equals("D"))	continue;
 
@@ -336,7 +340,7 @@ public class ProcBbdata
 			fis = new FileInputStream(file_path);
 			while(true) {
 				i_cnt++;
-				dataBuf = readLineByte(fis);
+				dataBuf = Util.readLineByte(fis);
 				if(dataBuf.length==0)	break;
 				if(!new String(dataBuf, 0, 1).equals("D"))	continue;
 				
@@ -445,7 +449,7 @@ public class ProcBbdata
 			fis = new FileInputStream(file_path);
 			while(true) {
 				i_cnt++;
-				dataBuf = readLineByte(fis);
+				dataBuf = Util.readLineByte(fis);
 				if(dataBuf.length==0)	break;
 				if(!new String(dataBuf, 0, 1).equals("D"))	continue;
 				
@@ -556,7 +560,7 @@ public class ProcBbdata
 			fis = new FileInputStream(file_path);
 			while(true) {
 				i_cnt++;
-				dataBuf = readLineByte(fis);
+				dataBuf = Util.readLineByte(fis);
 				if(dataBuf.length==0)	break;
 				if(!new String(dataBuf, 0, 1).equals("D"))	continue;
 				
@@ -649,7 +653,7 @@ public class ProcBbdata
 			fis = new FileInputStream(file_path);
 			while(true) {
 				i_cnt++;
-				dataBuf = readLineByte(fis);
+				dataBuf = Util.readLineByte(fis);
 				if(dataBuf.length==0)	break;
 				if(!new String(dataBuf, 0, 1).equals("D"))	continue;
 
@@ -737,5 +741,6 @@ public class ProcBbdata
 		String date			= format.format(cal.getTime());
 		return date;
 	}
+
 
 }

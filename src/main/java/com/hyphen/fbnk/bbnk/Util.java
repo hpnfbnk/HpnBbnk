@@ -4,9 +4,7 @@ import com.hyphen.fbnk.bbnk.define.Define;
 import com.hyphen.fbnk.bbnk.logging.Log;
 import com.hyphen.fbnk.bbnk.logging.LogFactory;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -104,7 +102,75 @@ public class Util {
         return oLen + sLen;
     }
 
+    public static boolean isAscii(byte chkByte){
+        return (0x80 & chkByte) == 0;
+    }
 
+    public static String byteFormat(String str, int len, String encodeTp) throws UnsupportedEncodingException {
+        String rt_val;
+        byte[] strBytes = str.getBytes(encodeTp);
+        if(encodeTp.equals("euc-kr")||encodeTp.equals("EUC-KR")||encodeTp.equals("euc_kr")||encodeTp.equals("EUC_KR")){
+            int cntSize, ttLen;
+            //한글깨지지않게..
+            for(ttLen = 0 ; ttLen < strBytes.length && ttLen < len ;){
+                if(isAscii(strBytes[ttLen]))    cntSize = 1;
+                else cntSize = 2;
+                if(ttLen+cntSize > strBytes.length || ttLen+cntSize > len) break;
+                ttLen += cntSize;
+            }
+            byte[] tgtBytes = new byte[ttLen];
+            System.arraycopy(strBytes, 0, tgtBytes, 0, ttLen);
+
+            rt_val = new String(tgtBytes, encodeTp);
+            if(ttLen < len){
+                int pad_len = len - tgtBytes.length;
+                StringBuilder pad_sb = new StringBuilder();
+                for(int i=0 ; i<pad_len ; i++)	pad_sb.append(" ");
+                rt_val += pad_sb;
+            }
+        }
+        else{
+            if(strBytes.length > len) rt_val = new String(strBytes, 0, len, encodeTp);
+            else {
+                int pad_len = len - strBytes.length;
+                StringBuilder pad_sb = new StringBuilder();
+                for(int i=0 ; i<pad_len ; i++)	pad_sb.append(" ");
+                rt_val = str + pad_sb;
+            }
+        }
+
+        return rt_val;
+    }
+
+    public static byte[] readLineByte(FileInputStream fis) throws IOException{
+        byte[] tmpByte = new byte[1024*2];
+        int iByte = 0, byteCnt = 0, chkByte = 0;
+
+        while(true){
+            iByte = fis.read();
+            //log.debug("[readLineByte] iByte="+iByte);
+            if(iByte<0)	break;	//EOF
+
+            if(iByte==10)   break;  //LF
+            else if(iByte==13){     //CR&LF
+                chkByte = fis.read();
+                if(chkByte==10) break;
+                else{
+                    tmpByte[byteCnt] = (byte) iByte;
+                    byteCnt++;
+                    iByte = chkByte;
+                }
+            }
+
+            tmpByte[byteCnt] = (byte) iByte;
+            byteCnt++;
+            if(byteCnt>(1024*2))	break;
+        }
+        byte[] resultByte = new byte[byteCnt];
+        System.arraycopy(tmpByte, 0, resultByte, 0, byteCnt);
+
+        return resultByte;
+    }
 
 
 }

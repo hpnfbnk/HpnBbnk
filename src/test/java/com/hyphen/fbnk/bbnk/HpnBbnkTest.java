@@ -1,10 +1,10 @@
 package com.hyphen.fbnk.bbnk;
 
-import com.hyphen.fbnk.bbnk.dto.DtoFileList;
-import com.hyphen.fbnk.bbnk.dto.DtoSRList;
+import com.hyphen.fbnk.bbnk.dto.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -154,6 +154,102 @@ public class HpnBbnkTest {
         else
             for(DtoFileList dtoFileList : dtoFileLists) System.out.println("hpnBbnk.recvDataMulti2DB : "+dtoFileList);
         assertNotNull(dtoFileLists);
+    }
+
+    //@Test
+    public void makeDataFile() {
+        boolean result;
+        /*
+        List<DtoReg> dtoRegList = new ArrayList<>();
+        dtoRegList.add(new DtoReg("HPN001", "089", "", "004", "123465789012", "1", "", "", "110203", "ABBT0001", "업무PPK1", "1", "1", ""));
+        dtoRegList.add(new DtoReg("HPN001", "089", "", "011", "883465789012", "1", "", "", "110203", "ABBT0002", "업무PPK2", "1", "1", ""));
+        result = hpnBbnk.makeDataFile("R00", dtoRegList, "./sample/R00.test");
+        */
+        /*
+        List<DtoBill> dtoBillList = new ArrayList<>();
+        dtoBillList.add(new DtoBill("HPN00387", "081", "20220628", "123456789012", "", "", "", "20220629-1",
+                "003", "12345678901234", 1500L, "", "", 0L, "NTP0001", "", "당근10kg", "", "당근농장A"));
+        dtoBillList.add(new DtoBill("HPN00387", "081", "20220628", "123456789012", "", "", "", "20220629-1",
+                "004", "123456789004", 1500L, "", "", 0L,"NTP0002", "", "당근102kg사주세요", "", "당근농장B"));
+        result = hpnBbnk.makeDataFile("200", dtoBillList, "./sample/make200.txt");
+         */
+        List<DtoPay> dtoPayList = new ArrayList<>();
+        dtoPayList.add(new DtoPay("HPN00387", "081", "20220628", "123456789012", "", "", "", "1", "20220629-1",
+                "003", "12345678901234", 1500L, "", "", 0L, "", "11월-급여", "", "당근농장A"));
+        dtoPayList.add(new DtoPay("HPN00387", "081", "20220628", "123456789012", "", "", "", "1", "20220629-1",
+                "004", "123456789004", 1500L, "", "", 0L, "", "12월-당기성과급여", "", "당근농장B"));
+        result = hpnBbnk.makeDataFile("300", dtoPayList, "./sample/make300.txt");
+
+        assertTrue(result);
+    }
+
+    //@Test
+    public void sendDataDto(){
+        boolean result;
+        /*
+        List<DtoReg> dtoRegList = new ArrayList<>();
+        dtoRegList.add(new DtoReg("HPN001", "089", "", "004", "123465789012", "1", "", "", "110203", "ABBT0001", "업무PPK1", "1", "1", ""));
+        dtoRegList.add(new DtoReg("HPN001", "089", "", "011", "883465789012", "1", "", "", "110203", "ABBT0002", "업무PPK2", "1", "1", ""));
+        result = hpnBbnk.sendDataDto("A004", "0084", "R00", dtoRegList, "./sample", "T");
+        */
+        /*
+        List<DtoBill> dtoBillList = new ArrayList<>();
+        dtoBillList.add(new DtoBill("HPN00387", "081", "20220628", "123456789012", "", "", "", "20220629-1",
+                "003", "12345678901234", 1500L, "", "", 0L, "NTP0001", "", "당근10kg", "", "당근농장A"));
+        dtoBillList.add(new DtoBill("HPN00387", "081", "20220628", "123456789012", "", "", "", "20220629-1",
+                "004", "123456789004", 1500L, "", "", 0L, "NTP0002", "", "당근102kg사주세요", "", "당근농장B"));
+        result = hpnBbnk.sendDataDto("A004", "0084", "200", dtoBillList, "./sample", "T");
+        */
+        List<DtoPay> dtoPayList = new ArrayList<>();
+        dtoPayList.add(new DtoPay("HPN00387", "081", "20220628", "123456789012", "", "", "", "1", "20220629-1",
+                "003", "12345678901234", 1500L, "", "", 0L, "", "11월-급여", "", "당근농장A"));
+        dtoPayList.add(new DtoPay("HPN00387", "081", "20220628", "123456789012", "", "", "", "1", "20220629-1",
+                "004", "123456789004", 1500L, "", "", 0L, "", "12월-당기성과급여", "", "당근농장B"));
+        result = hpnBbnk.sendDataDto("A004", "0081", "300", dtoPayList, "./sample", "T");
+
+        assertTrue(result);
+    }
+
+    //@Test
+    public void makeDtoList(){
+        /*
+        String infoCd = "R00";
+        String srcFilePath = "./sample/R00ComRecv.txt";
+        List<DtoReg> dtoRegList = (List<DtoReg>) hpnBbnk.makeDtoList(infoCd, srcFilePath);
+        if(dtoRegList.isEmpty()) System.out.println("hpnBbnk.makeDtoList : NO_DATA");
+        else
+            for (DtoReg dtoReg : dtoRegList) System.out.println("hpnBbnk.makeDtoList : "+dtoReg);
+        */
+        String infoCd = "200";
+        String srcFilePath = "./sample/200ComRecv.txt";
+        List<DtoBill> dtoBillList = (List<DtoBill>) hpnBbnk.makeDtoList(infoCd, srcFilePath);
+        if(dtoBillList.isEmpty()) System.out.println("hpnBbnk.makeDtoList : NO_DATA");
+        else
+            for (DtoBill dtoBill : dtoBillList) System.out.println("hpnBbnk.makeDtoList : "+dtoBill);
+
+        assertNotNull(dtoBillList);
+    }
+
+    //@Test
+    public void recvDataDto(){
+        /*
+        List<DtoReg> dtoRegList = (List<DtoReg>) hpnBbnk.recvDataDto("0084", "A004", "R00", "001", "20220628", "./sample", "T");
+        if(dtoRegList.isEmpty())    System.out.println("hpnBbnk.recvDataDto : NO_DATA");
+        else
+            for (DtoReg dtoReg : dtoRegList) System.out.println("hpnBbnk.recvDataDto : "+dtoReg);
+         */
+        /*
+        List<DtoBill> dtoBillList = (List<DtoBill>) hpnBbnk.recvDataDto("0084", "A004", "200", "001", "20220630", "./sample", "T");
+        if(dtoBillList.isEmpty())    System.out.println("hpnBbnk.recvDataDto : NO_DATA");
+        else
+            for (DtoBill dtoBill : dtoBillList) System.out.println("hpnBbnk.recvDataDto : "+dtoBill);
+         */
+        List<DtoPay> dtoPayList = (List<DtoPay>) hpnBbnk.recvDataDto("0081", "A004", "300", "001", "20220701", "./sample", "T");
+        if(dtoPayList.isEmpty())    System.out.println("hpnBbnk.recvDataDto : NO_DATA");
+        else
+            for (DtoPay dtoPay : dtoPayList) System.out.println("hpnBbnk.recvDataDto : "+dtoPay);
+
+        assertNotNull(dtoPayList);
     }
 
 
