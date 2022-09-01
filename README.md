@@ -268,6 +268,7 @@ List<DtoPay> dtoPayList = (List<DtoPay>) hpnBbnk.recvDataDto("0081", "A004", "30
 - [출금이체정보_통합관리시스템_전산설계서(KSNET)V3.7.docx](https://hpnfbnk.github.io/HpnBbnk/출금이체정보_통합관리시스템_전산설계서(KSNET)V3.7.docx) : 계좌통합관리업무용 안내문서
 - [HYPHEN 배치대행_운영설명서(v3.2.0).docx](https://hpnfbnk.github.io/HpnBbnk/HYPHEN배치대행_운영설명서(v3.2.0).docx) : 배치대행 운영설명
 - [HYPHEN 배치대행_파일포맷(금결원호환)(v3.2.0).xlsx](https://hpnfbnk.github.io/HpnBbnk/HYPHEN배치대행_파일포맷(금결원호환)(v3.2.0).xlsx) : 배치대행이체 파일포맷
+- [출금이체정보_통합관리시스템_전산설계서(HYPHEN-배치대행업체용)V3.3.docx](https://hpnfbnk.github.io/HpnBbnk/출금이체정보_통합관리시스템_전산설계서(HYPHEN-배치대행업체용)V3.3.docx) : 계좌통합관리업무용 안내문서(배치대행업체용) 
 - [법인카드가맹점신표준전문(banking).xls](https://hpnfbnk.github.io/HpnBbnk/법인카드가맹점신표준전문(banking).xls) : 법인카드사용내역 파일포맷
 - [HYPHEN펌뱅킹_파일종류구분코드표.xlsx](https://hpnfbnk.github.io/HpnBbnk/HYPHEN펌뱅킹_파일종류구분코드표.xlsx) : 파일종류구분표
 - [배치펌뱅킹_오류코드정리.xlsx](https://hpnfbnk.github.io/HpnBbnk/배치펌뱅킹_오류코드정리.xlsx) : 오류코드표
