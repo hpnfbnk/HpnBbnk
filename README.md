@@ -22,7 +22,7 @@ pom.xml에 아래 내용을 추가해주시면 됩니다.
 <dependency>
     <groupId>com.github.hpnfbnk</groupId>
     <artifactId>HpnBbnk</artifactId>
-    <version>1.3.0</version>
+    <version>1.4.0</version>
 </dependency>
 ```
 
@@ -195,7 +195,7 @@ List<DtoFileList> dtoFileLists = hpnBbnk.recvDataMulti2DB(recvCd, sendCd, infoCd
 ```java
 /**
 * Dto 리스트를 받아 요청파일로 생성
-* @param infoCd 파일종류구분코드 계좌등록:R00(I0R), 자동이체:200(I02), 지급이체(송금):300(I03) 등..
+* @param infoCd 파일종류구분코드 계좌등록:R00(I0R), 자동이체:200(I02), 지급이체(송금):300(I03), 증빙자료:Y00(IY0), 증빙자료-사후점검:Y06(IY6)
 * @param dtoList Dto리스트 계좌등록:DtoReg, 자동이체:DtoBill, 지급이체:DtoPay 등..
 * @param desFilePath 요청파일저장경로
 * @return true:성공 false:실패
@@ -214,7 +214,7 @@ boolean result = hpnBbnk.makeDataFile("200", dtoBillList, "./sample/make200.txt"
 * Dto 리스트를 받아 요청파일로 생성하여 HYPHEN으로 송신
 * @param sendCd sendCd 송신자코드 Hyphen에서 발급한 업체코드
 * @param recvCd recvCd 수신자코드 '0'+3자리은행코드, 하나은행:0081, 농협:0011 등..
-* @param infoCd 파일종류구분코드 계좌등록:R00(I0R), 자동이체:200(I03), 지급이체(송금):300(I03) 등..
+* @param infoCd 파일종류구분코드 계좌등록:R00(I0R), 자동이체:200(I03), 지급이체(송금):300(I03), 증빙자료:Y00(IY0), 증빙자료-사후점검:Y06(IY6)
 * @param dtoList Dto리스트 계좌등록:DtoReg, 자동이체:DtoBill 등..
 * @param saveDir 생성돤파일 저장할 디렉토리
 * @param runMode 동작모드 Y:운영 T:test
@@ -232,7 +232,7 @@ boolean result = hpnBbnk.sendDataDto("A004", "0084", "200", dtoBillList, "./samp
 ```java
 /**
 * 결과파일을 Dto 리스트로 변환
-* @param infoCd 파일종류구분코드 계좌등록:R00(I0R), 자동이체:200(I03), 지급이체(송금):300(I03) 등..
+* @param infoCd 파일종류구분코드 계좌등록:R00(I0R), 자동이체:200(I03), 지급이체(송금):300(I03), 증빙자료:Y00(IY0), 증빙자료-사후점검:Y05(IY5), 증빙자료-사후점검-검증결과:Y06(IY6)
 * @param srcFilePath 결과파일위치
 * @return Dto리스트 계좌등록:DtoReg, 자동이체:DtoBill 등..
 */
@@ -245,7 +245,7 @@ List<DtoBill> dtoBillList = (List<DtoBill>) hpnBbnk.makeDtoList("200", "./sample
 * Hyphen에서 결과파일 수신하여 Dto 리스트로 변환
 * @param sendCd 송신자코드 '0'+3자리은행코드, 하나은행:0081, 농협:0011 등..
 * @param recvCd 수신자코드 Hyphen에서 발급한 업체코드
-* @param infoCd 파일종류구분코드 계좌등록:R00(I0R), 자동이체:200(I03), 지급이체(송금):300(I03) 등..
+* @param infoCd 파일종류구분코드 계좌등록:R00(I0R), 자동이체:200(I03), 지급이체(송금):300(I03), 증빙자료:Y00(IY0), 증빙자료-사후점검:Y05(IY5), 증빙자료-사후점검-검증결과:Y06(IY6)
 * @param seqNo 파일순번
 * @param sendDt 송신일자
 * @param saveDir 수신파일보관경로

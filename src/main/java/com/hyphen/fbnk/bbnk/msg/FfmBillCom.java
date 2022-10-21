@@ -159,8 +159,10 @@ public class FfmBillCom {
         this.tFailAmt  = String.format("%015d", 0);
         String recBuf = String.format("%-1s", tRecTp)+this.tRecCnt+this.tReqCnt+this.tReqAmt+ this.tFineCnt+ this.tFineAmt+
                 this.tPartCnt+ this.tPartAmt+ this.tFailCnt+ this.tFailAmt+String.format("%-24s", tFiller)+"\r\n";
+        byte[] rtnBuf = new byte[0];
+        try {rtnBuf = recBuf.getBytes(encodeTp);} catch (UnsupportedEncodingException ignored) {}
 
-        return recBuf.getBytes();
+        return rtnBuf;
     }
 
     public boolean makeFile(List<DtoBill> dtoBillList, String desFilePath){
@@ -181,7 +183,7 @@ public class FfmBillCom {
                 //make data
                 fout.write(billCom.getData());
                 //make end
-                if(dataSeq== dtoBillList.size()) fout.write(billCom.getEnd(dataSeq, ttReqAmt));
+                if(dataSeq == dtoBillList.size()) fout.write(billCom.getEnd(dataSeq, ttReqAmt));
             }
         } catch (Exception e) {
             e.printStackTrace();
