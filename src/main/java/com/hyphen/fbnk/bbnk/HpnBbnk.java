@@ -127,8 +127,9 @@ public class HpnBbnk {
     /**
      * Hyphen으로 요청파일 송신
      * @param sendCd 송신자코드 Hyphen에서 발급한 업체코드
-     * @param recvCd 수신자코드 '0'+3자리은행코드, 하나은행:0081, 농협:0011, HYPHEN통합서버:0998 등..
-     * @param infoCd 파일종류구분코드 계좌등록:R00(I0R), 자동이체:200(I02), 지급이체(송금):300(I03), 증빙자료:Y00(IY0) 등..
+     * @param recvCd 수신자코드 '0'+3자리은행코드, 하나은행:0081, 농협:0011, HYPHEN통합서버:0998, HYPHEN배치대행서버:0997 등..
+     * @param infoCd 파일종류구분코드 계좌등록:R00(I0R), 자동이체:200(I02), 지급이체(송금):300(I03), 증빙자료:Y00(IY0, AY0), 증빙자료-사후점검:Y06(IY6), 계좌변경접수결과:Y01(IY1),
+     *               배치대행-증빙등록(AY0), 배치대행-자동이체(A02), 배치대행-계좌등록(A0R) 등..
      * @param filePath 송신대상파일 위치
      * @param runMode 동작모드 Y:운영 T:test
      * @return true:성공 false:실패
@@ -220,7 +221,8 @@ public class HpnBbnk {
      * 송수신 목록조회
      * @param finderCd 조회자코드
      * @param targetCd 조회대상자코드 모든대상자:9999)
-     * @param infoCd 조회대상파일종류 모든종류:ZZZ 계좌등록:R00(I0R), 자동이체:200(I02), 지급이체(송금):300(I03), 증빙자료:Y00(IY0) 등..
+     * @param infoCd 조회대상파일종류 모든종류:ZZZ 계좌등록결과:R00(I0R), 자동이체결과:200(I02), 지급이체(송금)결과:300(I03), 증빙자료등록결과:Y00(IY0, AY0), 증빙자료-사후점검:Y05(IY5), 증빙자료-사후점검-검증결과:Y06(IY6),
+     *               해지통보:Y03(IY3), 계좌변경접수요청:Y01(IY1), 계좌변경처리결과:Y02(IY2), 배치대행-증빙등록결과(AY0), 배치대행-계좌등록결과(A0R), 배치대행-자동이체결과(A02) 등..
      * @param fromDt 조회범위-시작일자 YYYYMMDD
      * @param toDt 조회범위-종료일자 YYYYMMDD
      * @param listTp 목록종류 수신목록:M 송신목록:L
@@ -257,7 +259,8 @@ public class HpnBbnk {
      * Hyphen에서 여러개 파일 수신
      * @param finderCd 조회자코드
      * @param targetCd 조회대상자코드 모든대상자:9999)
-     * @param infoCd 조회대상파일종류 모든종류:ZZZ 계좌등록:R00(I0R), 자동이체:200(I02), 지급이체(송금):300(I03), 증빙자료:Y00(IY0) 등..
+     * @param infoCd 조회대상파일종류 모든종류:ZZZ 계좌등록결과:R00(I0R), 자동이체결과:200(I02), 지급이체(송금)결과:300(I03), 증빙자료:Y00(IY0), 증빙자료등록결과:Y00(IY0, AY0), 증빙자료-사후점검:Y05(IY5), 증빙자료-사후점검-검증결과:Y06(IY6),
+     *               해지통보:Y03(IY3), 계좌변경접수요청:Y01(IY1), 계좌변경처리결과:Y02(IY2), 배치대행-증빙등록결과(AY0), 배치대행-계좌등록결과(A0R), 배치대행-자동이체결과(A02) 등..
      * @param fromDt 조회범위-시작일자 YYYYMMDD
      * @param toDt 조회범위-종료일자 YYYYMMDD
      * @param findRng 조회범위-수신여부 미수신건만:E 모두:A
@@ -296,9 +299,10 @@ public class HpnBbnk {
 
     /**
      * Hyphen에서 결과파일 수신
-     * @param sendCd 송신자코드 '0'+3자리은행코드, 하나은행:0081, 농협:0011, HYPHEN통합서버:0998 등..
+     * @param sendCd 송신자코드 '0'+3자리은행코드, 하나은행:0081, 농협:0011, HYPHEN통합서버:0998, HYPHEN배치대행서버:0997 등..
      * @param recvCd 수신자코드 Hyphen에서 발급한 업체코드
-     * @param infoCd 파일종류구분코드 계좌등록:R00(I0R), 자동이체:200(I02), 지급이체(송금):300(I03), 증빙자료:Y00(IY0) 등..
+     * @param infoCd 파일종류구분코드 계좌등록결과:R00(I0R), 자동이체결과:200(I02), 지급이체(송금)결과:300(I03), 증빙자료등록결과:Y00(IY0, AY0), 증빙자료-사후점검:Y05(IY5), 증빙자료-사후점검-검증결과:Y06(IY6),
+     *               해지통보:Y03(IY3), 계좌변경접수요청:Y01(IY1), 계좌변경처리결과:Y02(IY2), 배치대행-증빙등록결과(AY0), 배치대행-계좌등록결과(A0R), 배치대행-자동이체결과(A02) 등..
      * @param seqNo 파일순번
      * @param sendDt 송신일자
      * @param filePath 수신대상파일 저장위치
@@ -439,7 +443,8 @@ public class HpnBbnk {
 
     /**
      * Dto 리스트를 받아 요청파일로 생성
-     * @param infoCd 파일종류구분코드 계좌등록:R00(I0R), 자동이체:200(I02), 지급이체(송금):300(I03), 증빙자료:Y00(IY0), 증빙자료-사후점검:Y06(IY6)
+     * @param infoCd 파일종류구분코드 계좌등록:R00(I0R), 자동이체:200(I02), 지급이체(송금):300(I03), 증빙자료:Y00(IY0, AY0), 증빙자료-사후점검:Y06(IY6), 계좌변경접수결과:Y01(IY1),
+     *               배치대행-증빙등록(AY0), 배치대행-자동이체(A02), 배치대행-계좌등록(A0R)
      * @param dtoList Dto리스트 계좌등록:DtoReg, 자동이체:DtoBill, 지급이체:DtoPay, 증빙자료:DtoPrf
      * @param desFilePath 요청파일저장경로
      * @return true:성공 false:실패
@@ -490,6 +495,7 @@ public class HpnBbnk {
                 break;
             case "Y00":
             case "IY0":
+            case "AY0":
                 if(!(dtoList.get(0) instanceof DtoPrf)){
                     log.error("[makeDataFile] incorrect dtoList~!!");
                     return false;
@@ -510,6 +516,37 @@ public class HpnBbnk {
                 FfmAftPrfInf ffmAftPrfInf = new FfmAftPrfInf();
                 result = ffmAftPrfInf.makeFile(dtoAftPrfList, desFilePath);
                 break;
+            case "Y01":
+            case "IY1":
+                if(!(dtoList.get(0) instanceof DtoShift)){
+                    log.error("[makeDataFile] incorrect dtoList~!!");
+                    return false;
+                }
+                List<DtoShift> dtoShiftList = new ArrayList<>();
+                for (Object dto : dtoList) dtoShiftList.add((DtoShift) dto);
+                FfmShiftRep ffmShiftRep = new FfmShiftRep();
+                result = ffmShiftRep.makeFile(dtoShiftList, desFilePath);
+                break;
+            case "A0R":
+                if(!(dtoList.get(0) instanceof DtoReg)){
+                    log.error("[makeDataFile] incorrect dtoList~!!");
+                    return false;
+                }
+                List<DtoReg> dtoRegAgList = new ArrayList<>();
+                for (Object dto : dtoList) dtoRegAgList.add((DtoReg) dto);
+                FfmRegAg ffmRegAg = new FfmRegAg();
+                result = ffmRegAg.makeFile(dtoRegAgList, desFilePath);
+                break;
+            case "A02":
+                if(!(dtoList.get(0) instanceof DtoBill)){
+                    log.error("[makeDataFile] incorrect dtoList~!!");
+                    return false;
+                }
+                List<DtoBill> dtoBillAgList = new ArrayList<>();
+                for (Object dto : dtoList) dtoBillAgList.add((DtoBill) dto);
+                FfmBillAg ffmBillAg = new FfmBillAg();
+                result = ffmBillAg.makeFile(dtoBillAgList, desFilePath);
+                break;
         }
 
         return result;
@@ -518,8 +555,9 @@ public class HpnBbnk {
     /**
      * Dto 리스트를 받아 요청파일로 생성하여 HYPHEN으로 송신
      * @param sendCd sendCd 송신자코드 Hyphen에서 발급한 업체코드
-     * @param recvCd recvCd 수신자코드 '0'+3자리은행코드, 하나은행:0081, 농협:0011, HYPHEN통합서버:0998 등..
-     * @param infoCd 파일종류구분코드 계좌등록:R00(I0R), 자동이체:200(I03), 지급이체(송금):300(I03), 증빙자료:Y00(IY0), 증빙자료-사후점검:Y06(IY6)
+     * @param recvCd recvCd 수신자코드 '0'+3자리은행코드, 하나은행:0081, 농협:0011, HYPHEN통합서버:0998, HYPHEN배치대행서버:0997 등..
+     * @param infoCd 파일종류구분코드 계좌등록:R00(I0R), 자동이체:200(I03), 지급이체(송금):300(I03), 증빙자료:Y00(IY0, AY0), 증빙자료-사후점검:Y06(IY6), 계좌변경접수결과:Y01(IY1),
+     *               배치대행-증빙등록(AY0), 배치대행-자동이체(A02), 배치대행-계좌등록(A0R)
      * @param dtoList Dto리스트 계좌등록:DtoReg, 자동이체:DtoBill, 지급이체:DtoPay, 증빙자료:DtoPrf
      * @param saveDir 생성돤파일 저장할 디렉토리
      * @param runMode 동작모드 Y:운영 T:test
@@ -558,7 +596,8 @@ public class HpnBbnk {
 
     /**
      * 결과파일을 Dto 리스트로 변환
-     * @param infoCd 파일종류구분코드 계좌등록:R00(I0R), 자동이체:200(I03), 지급이체(송금):300(I03), 증빙자료:Y00(IY0), 증빙자료-사후점검:Y05(IY5), 증빙자료-사후점검-검증결과:Y06(IY6)
+     * @param infoCd 파일종류구분코드 계좌등록결과:R00(I0R), 자동이체결과:200(I03), 지급이체(송금)결과:300(I03), 증빙자료등록결과:Y00(IY0, AY0), 증빙자료-사후점검:Y05(IY5), 증빙자료-사후점검-검증결과:Y06(IY6),
+     *               해지통보:Y03(IY3), 계좌변경접수요청:Y01(IY1), 계좌변경처리결과:Y02(IY2), 배치대행-증빙등록결과(AY0), 배치대행-계좌등록결과(A0R), 배치대행-자동이체결과(A02)
      * @param srcFilePath 결과파일위치
      * @return Dto리스트 계좌등록:DtoReg, 자동이체:DtoBill 등..
      */
@@ -582,6 +621,7 @@ public class HpnBbnk {
                 break;
             case "Y00":
             case "IY0":
+            case "AY0":
                 FfmPrfRep prfRep = new FfmPrfRep();
                 dtoList = prfRep.makeDtoList(srcFilePath);
                 break;
@@ -595,6 +635,29 @@ public class HpnBbnk {
                 FfmAftPrfInf aftPrfInf = new FfmAftPrfInf();
                 dtoList = aftPrfInf.makeDtoList(srcFilePath);
                 break;
+            case "Y03":
+            case "IY3":
+                FfmCanc canc = new FfmCanc();
+                dtoList = canc.makeDtoList(srcFilePath);
+                break;
+            case "Y01":
+            case "IY1":
+                FfmShiftReq shiftReq = new FfmShiftReq();
+                dtoList = shiftReq.makeDtoList(srcFilePath);
+                break;
+            case "Y02":
+            case "IY2":
+                FfmShiftCnfrm shiftCnfrm = new FfmShiftCnfrm();
+                dtoList = shiftCnfrm.makeDtoList(srcFilePath);
+                break;
+            case "A0R":
+                FfmRegAg regAg = new FfmRegAg();
+                dtoList = regAg.makeDtoList(srcFilePath);
+                break;
+            case "A02":
+                FfmBillAg billAg = new FfmBillAg();
+                dtoList = billAg.makeDtoList(srcFilePath);
+                break;
         }
 
         return dtoList;
@@ -602,9 +665,10 @@ public class HpnBbnk {
 
     /**
      * Hyphen에서 결과파일 수신하여 Dto 리스트로 변환
-     * @param sendCd 송신자코드 '0'+3자리은행코드, 하나은행:0081, 농협:0011 등..
+     * @param sendCd 송신자코드 '0'+3자리은행코드, 하나은행:0081, 농협:0011, HYPHEN통합서버:0998, HYPHEN배치대행서버:0997 등..
      * @param recvCd 수신자코드 Hyphen에서 발급한 업체코드
-     * @param infoCd 파일종류구분코드 계좌등록:R00(I0R), 자동이체:200(I03), 지급이체(송금):300(I03), 증빙자료:Y00(IY0), 증빙자료-사후점검:Y05(IY5), 증빙자료-사후점검-검증결과:Y06(IY6)
+     * @param infoCd 파일종류구분코드 계좌등록결과:R00(I0R), 자동이체결과:200(I03), 지급이체(송금)결과:300(I03), 증빙자료등록결과:Y00(IY0), 증빙자료-사후점검:Y05(IY5), 증빙자료-사후점검-검증결과:Y06(IY6),
+     *               해지통보:Y03(IY3), 계좌변경접수요청:Y01(IY1), 계좌변경처리결과:Y02(IY2), 배치대행-증빙등록결과(AY0), 배치대행-계좌등록결과(A0R), 배치대행-자동이체결과(A02)
      * @param seqNo 파일순번
      * @param sendDt 송신일자
      * @param saveDir 수신파일보관경로

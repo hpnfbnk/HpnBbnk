@@ -204,7 +204,7 @@ public class HpnBbnkTest {
 
     //@Test
     public void sendDataDto(){
-        boolean result;
+        boolean result = false;
         /*
         List<DtoReg> dtoRegList = new ArrayList<>();
         dtoRegList.add(new DtoReg("HPN001", "089", "", "004", "123465789012", "1", "", "", "110203", "ABBT0001", "업무PPK1", "1", "1", ""));
@@ -237,7 +237,23 @@ public class HpnBbnkTest {
                 "081", "123456789015", "1", "txt", "N", "./sample/prf.txt", ""));
         result = hpnBbnk.sendDataDto("A001", "0081", "Y00", dtoPrfList, "./sample", "T");
         */
-
+        /*
+        List<DtoPrf> dtoPrfList = new ArrayList<>();
+        dtoPrfList.add(new DtoPrf("08000160", "20221031", "20221028", "0", "820716", "N", "_NKP001",
+                "039", "600220154278", "1", "png", "N", "./sample/prf.png", ""));
+        dtoPrfList.add(new DtoPrf("08000160", "20221031", "20221028", "0", "510315", "N", "_NKP002",
+                "039", "537220096995", "1", "txt", "N", "./sample/prf.txt", ""));
+        dtoPrfList.add(new DtoPrf("08000160", "20221031", "20221028", "0", "530528", "N", "_NKP003",
+                "039", "600220104143", "1", "png", "N", "./sample/prf.png", ""));
+        dtoPrfList.add(new DtoPrf("08000160", "20221031", "20221028", "0", "721001", "N", "_NKP004",
+                "039", "600210164997", "1", "png", "N", "./sample/prf.png", ""));
+        dtoPrfList.add(new DtoPrf("08000160", "20221031", "20221028", "0", "660503", "N", "_NKP005",
+                "039", "548220334870", "1", "png", "N", "./sample/prf.png", ""));
+        dtoPrfList.add(new DtoPrf("08000160", "20221031", "20221028", "0", "921001", "N", "_NKP006",
+                "039", "910210164997", "1", "png", "Y", "", ""));
+        result = hpnBbnk.sendDataDto("6759", "0997", "AY0", dtoPrfList, "./sample", "T");
+        */
+        /*
         List<DtoAftPrf> dtoAftPrfList = new ArrayList<>();
         dtoAftPrfList.add(new DtoAftPrf("011", "FE00032", "20221019", "KSA001", "1", "1008800023", "KP20221011-1",
                 "011", "123456789012", "20221017", "1", "Y", "png", "./sample/prf.png", ""));
@@ -246,6 +262,42 @@ public class HpnBbnkTest {
         dtoAftPrfList.add(new DtoAftPrf("011", "FE00032", "20221019", "KSA001", "1", "1008800031", "KP20221011-3",
                 "011", "123456789014", "20221016", "1", "Y", "png", "./sample/prf.png", ""));
         result = hpnBbnk.sendDataDto("A001", "0081", "Y06", dtoAftPrfList, "./sample", "T");
+        */
+
+        //계좌변경접수요청(FB0211) 수신data를 받아 응답값 세팅후 계좌변경접수결과(FB0221) 생성.
+        /*
+        List<DtoShift> dtoShiftList = (List<DtoShift>) hpnBbnk.recvDataDto("0998", "A001", "IY1", "001", "20221101", "./sample", "T");
+        if(dtoShiftList.isEmpty())   System.out.println("hpnBbnk.recvDataDto : NO_DATA");
+        else for (DtoShift dtoShift  : dtoShiftList) System.out.println("hpnBbnk.recvDataDto : "+dtoShift);
+        System.out.println("Reply 4 shift request ...");
+        int dataSeq = 0;
+        for (DtoShift dtoShift : dtoShiftList) {
+            dataSeq++;
+            if(dataSeq == 2){
+                dtoShift.setAcceptDt(Util.getCurDtTm().substring(0, 8));
+                dtoShift.setRtnCd("7107");
+            } else {
+                dtoShift.setAcceptDt(Util.getCurDtTm().substring(0, 8));
+                dtoShift.setRtnCd("0000");
+                dtoShift.setAftFacCd("aft0123");
+                dtoShift.setAftNapbuNo(dtoShift.getBefNapbuNo());
+            }
+            System.out.println("hpnBbnk.sendDataDto : "+dtoShift);
+        }
+        result = hpnBbnk.sendDataDto("A001", "0998", "IY1", dtoShiftList, "./sample", "T");
+         */
+        /*
+        List<DtoReg> dtoRegList = new ArrayList<>();
+        dtoRegList.add(new DtoReg("HPN001", "089", "", "004", "123465789012", "1", "", "", "110203", "ABBT0001", "", "1", "1", ""));
+        dtoRegList.add(new DtoReg("HPN001", "089", "", "011", "883465789012", "1", "", "", "110203", "ABBT0002", "", "1", "1", ""));
+        result = hpnBbnk.sendDataDto("A004", "0997", "A0R", dtoRegList, "./sample", "T");
+        */
+        List<DtoBill> dtoBillList = new ArrayList<>();
+        dtoBillList.add(new DtoBill("08000138", "", "20221117", "", "", "", "", "20221115-1",
+                "003", "12345678901234", 1500L, "", "", 0L, "NTP0001", "", "당근10kg", "", "ABCDEFG"));
+        dtoBillList.add(new DtoBill("08000138", "", "20221117", "", "", "", "", "20221115-1",
+                "004", "123456789004", 1600L, "", "", 0L, "NTP0002", "", "당근102kg사주세요", "", "당근농장B"));
+        result = hpnBbnk.sendDataDto("A001", "0997", "A02", dtoBillList, "./sample", "T");
 
         assertTrue(result);
     }
@@ -291,14 +343,14 @@ public class HpnBbnkTest {
         else
             for (DtoPay dtoPay : dtoPayList) System.out.println("hpnBbnk.recvDataDto : "+dtoPay);
         */
-
+        /*
         objects = hpnBbnk.recvDataDto("0081", "A001", "Y00", "001", "20221019", "./sample", "T");
         if(objects.isEmpty())   System.out.println("hpnBbnk.recvDataDto : NO_DATA");
         else
             for (DtoPrf dtoPrf : (List<DtoPrf>) objects) System.out.println("hpnBbnk.recvDataDto : "+dtoPrf);
-
+        */
         /*
-        objects = hpnBbnk.recvDataDto("0023", "1475", "Y05", "001", "20221019", "./sample", "T");
+        objects = hpnBbnk.recvDataDto("0023", "A001", "Y05", "001", "20221019", "./sample", "T");
         if(objects.isEmpty())   System.out.println("hpnBbnk.recvDataDto : NO_DATA");
         else
             for (DtoAftPrf dtoAftPrf : (List<DtoAftPrf>) objects) System.out.println("hpnBbnk.recvDataDto : "+dtoAftPrf);
@@ -309,6 +361,36 @@ public class HpnBbnkTest {
         else
             for (DtoAftPrf dtoAftPrf : (List<DtoAftPrf>) objects) System.out.println("hpnBbnk.recvDataDto : "+dtoAftPrf);
         */
+        /*
+        objects = hpnBbnk.recvDataDto("0998", "A001", "IY3", "001", "20221024", "./sample", "T");
+        if(objects.isEmpty())   System.out.println("hpnBbnk.recvDataDto : NO_DATA");
+        else
+            for (DtoCanc dtoCanc : (List<DtoCanc>) objects) System.out.println("hpnBbnk.recvDataDto : "+dtoCanc);
+         */
+        /*
+        objects = hpnBbnk.recvDataDto("0998", "A001", "IY1", "001", "20221101", "./sample", "T");
+        if(objects.isEmpty())   System.out.println("hpnBbnk.recvDataDto : NO_DATA");
+        else
+            for (DtoShift dtoShift  : (List<DtoShift>) objects) System.out.println("hpnBbnk.recvDataDto : "+dtoShift);
+         */
+        /*
+        objects = hpnBbnk.recvDataDto("0084", "A001", "Y02", "001", "20221110", "./sample", "T");
+        if(objects.isEmpty())   System.out.println("hpnBbnk.recvDataDto : NO_DATA");
+        else for (DtoShift dtoShift  : (List<DtoShift>) objects) System.out.println("hpnBbnk.recvDataDto : "+dtoShift);
+         */
+        /*
+        objects = hpnBbnk.recvDataDto("0997", "A004", "A0R", "001", "20221111", "./sample", "T");
+        if(objects.isEmpty())   System.out.println("hpnBbnk.recvDataDto : NO_DATA");
+        else for (DtoReg dtoReg  : (List<DtoReg>) objects) System.out.println("hpnBbnk.recvDataDto : "+dtoReg);
+         */
+        /*
+        objects = hpnBbnk.recvDataDto("0997", "6759", "A02", "001", "20221116", "./sample", "T");
+        if(objects.isEmpty())    System.out.println("hpnBbnk.recvDataDto : NO_DATA");
+        else for (DtoBill dtoBill : (List<DtoBill>) objects) System.out.println("hpnBbnk.recvDataDto : "+dtoBill);
+         */
+        objects = hpnBbnk.recvDataDto("0997", "A001", "AY0", "001", "20221116", "./sample", "T");
+        if(objects.isEmpty())   System.out.println("hpnBbnk.recvDataDto : NO_DATA");
+        else for (DtoPrf dtoPrf : (List<DtoPrf>) objects) System.out.println("hpnBbnk.recvDataDto : "+dtoPrf);
 
         assertNotNull(objects);
     }
