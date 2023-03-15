@@ -129,7 +129,7 @@ public class HpnBbnk {
      * @param sendCd 송신자코드 Hyphen에서 발급한 업체코드
      * @param recvCd 수신자코드 '0'+3자리은행코드, 하나은행:0081, 농협:0011, HYPHEN통합서버:0998, HYPHEN배치대행서버:0997 등..
      * @param infoCd 파일종류구분코드 계좌등록:R00(I0R), 자동이체:200(I02), 지급이체(송금):300(I03), 증빙자료:Y00(IY0, AY0), 증빙자료-사후점검:Y06(IY6), 계좌변경접수결과:Y01(IY1),
-     *               배치대행-증빙등록(AY0), 배치대행-자동이체(A02), 배치대행-계좌등록(A0R) 등..
+     *               배치대행-증빙등록(AY0), 배치대행-자동이체(A02), 배치대행-계좌등록(A0R), 배치성실시간-송금이체(BR3) 등..
      * @param filePath 송신대상파일 위치
      * @param runMode 동작모드 Y:운영 T:test
      * @return true:성공 false:실패
@@ -222,7 +222,7 @@ public class HpnBbnk {
      * @param finderCd 조회자코드
      * @param targetCd 조회대상자코드 모든대상자:9999)
      * @param infoCd 조회대상파일종류 모든종류:ZZZ 계좌등록결과:R00(I0R), 자동이체결과:200(I02), 지급이체(송금)결과:300(I03), 증빙자료등록결과:Y00(IY0, AY0), 증빙자료-사후점검:Y05(IY5), 증빙자료-사후점검-검증결과:Y06(IY6),
-     *               해지통보:Y03(IY3), 계좌변경접수요청:Y01(IY1), 계좌변경처리결과:Y02(IY2), 배치대행-증빙등록결과(AY0), 배치대행-계좌등록결과(A0R), 배치대행-자동이체결과(A02) 등..
+     *               해지통보:Y03(IY3), 계좌변경접수요청:Y01(IY1), 계좌변경처리결과:Y02(IY2), 배치대행-증빙등록결과(AY0), 배치대행-계좌등록결과(A0R), 배치대행-자동이체결과(A02), 배치성실시간-송금이체(BR3) 등..
      * @param fromDt 조회범위-시작일자 YYYYMMDD
      * @param toDt 조회범위-종료일자 YYYYMMDD
      * @param listTp 목록종류 수신목록:M 송신목록:L
@@ -260,7 +260,7 @@ public class HpnBbnk {
      * @param finderCd 조회자코드
      * @param targetCd 조회대상자코드 모든대상자:9999)
      * @param infoCd 조회대상파일종류 모든종류:ZZZ 계좌등록결과:R00(I0R), 자동이체결과:200(I02), 지급이체(송금)결과:300(I03), 증빙자료:Y00(IY0), 증빙자료등록결과:Y00(IY0, AY0), 증빙자료-사후점검:Y05(IY5), 증빙자료-사후점검-검증결과:Y06(IY6),
-     *               해지통보:Y03(IY3), 계좌변경접수요청:Y01(IY1), 계좌변경처리결과:Y02(IY2), 배치대행-증빙등록결과(AY0), 배치대행-계좌등록결과(A0R), 배치대행-자동이체결과(A02) 등..
+     *               해지통보:Y03(IY3), 계좌변경접수요청:Y01(IY1), 계좌변경처리결과:Y02(IY2), 배치대행-증빙등록결과(AY0), 배치대행-계좌등록결과(A0R), 배치대행-자동이체결과(A02), 배치성실시간-송금이체(BR3) 등..
      * @param fromDt 조회범위-시작일자 YYYYMMDD
      * @param toDt 조회범위-종료일자 YYYYMMDD
      * @param findRng 조회범위-수신여부 미수신건만:E 모두:A
@@ -302,7 +302,7 @@ public class HpnBbnk {
      * @param sendCd 송신자코드 '0'+3자리은행코드, 하나은행:0081, 농협:0011, HYPHEN통합서버:0998, HYPHEN배치대행서버:0997 등..
      * @param recvCd 수신자코드 Hyphen에서 발급한 업체코드
      * @param infoCd 파일종류구분코드 계좌등록결과:R00(I0R), 자동이체결과:200(I02), 지급이체(송금)결과:300(I03), 증빙자료등록결과:Y00(IY0, AY0), 증빙자료-사후점검:Y05(IY5), 증빙자료-사후점검-검증결과:Y06(IY6),
-     *               해지통보:Y03(IY3), 계좌변경접수요청:Y01(IY1), 계좌변경처리결과:Y02(IY2), 배치대행-증빙등록결과(AY0), 배치대행-계좌등록결과(A0R), 배치대행-자동이체결과(A02) 등..
+     *               해지통보:Y03(IY3), 계좌변경접수요청:Y01(IY1), 계좌변경처리결과:Y02(IY2), 배치대행-증빙등록결과(AY0), 배치대행-계좌등록결과(A0R), 배치대행-자동이체결과(A02), 배치성실시간-송금이체(BR3) 등..
      * @param seqNo 파일순번
      * @param sendDt 송신일자
      * @param filePath 수신대상파일 저장위치
@@ -444,8 +444,9 @@ public class HpnBbnk {
     /**
      * Dto 리스트를 받아 요청파일로 생성
      * @param infoCd 파일종류구분코드 계좌등록:R00(I0R), 자동이체:200(I02), 지급이체(송금):300(I03), 증빙자료:Y00(IY0, AY0), 증빙자료-사후점검:Y06(IY6), 계좌변경접수결과:Y01(IY1),
-     *               배치대행-증빙등록(AY0), 배치대행-자동이체(A02), 배치대행-계좌등록(A0R)
-     * @param dtoList Dto리스트 계좌등록:DtoReg, 자동이체:DtoBill, 지급이체:DtoPay, 증빙자료:DtoPrf
+     *               배치대행-증빙등록(AY0), 배치대행-자동이체(A02), 배치대행-계좌등록(A0R), 배치성실시간-송금이체(BR3)
+     * @param dtoList Dto리스트 계좌등록:DtoReg (infoCd:R00, I0R, A0R 용), 자동이체:DtoBill (infoCd:200, I02, A02 용), 지급이체:DtoPay (infoCd:300, I03, BR3 용),
+     *               증빙자료:DtoPrf(infoCd:Y00, IY0. AY0 용), 증빙자료-사후점검:DtoAftPrf(infoCd:Y06, IY6 용), 계좌변경접수결과:DtoShift(infoCd:Y01, IY1 용)
      * @param desFilePath 요청파일저장경로
      * @return true:성공 false:실패
      */
@@ -492,6 +493,16 @@ public class HpnBbnk {
                 for (Object dto : dtoList) dtoPayList.add((DtoPay) dto);
                 FfmPayCom ffmPayCom = new FfmPayCom();
                 result = ffmPayCom.makeFile(dtoPayList, desFilePath);
+                break;
+            case "BR3":
+                if (!(dtoList.get(0) instanceof DtoPay)) {
+                    log.error("[makeDataFile] incorrect dtoList~!!");
+                    return false;
+                }
+                List<DtoPay> dtoPayBtrList = new ArrayList<>();
+                for (Object dto : dtoList) dtoPayBtrList.add((DtoPay) dto);
+                FfmPayBtr ffmPayBtr = new FfmPayBtr();
+                result = ffmPayBtr.makeFile(dtoPayBtrList, desFilePath);
                 break;
             case "Y00":
             case "IY0":
@@ -557,8 +568,9 @@ public class HpnBbnk {
      * @param sendCd sendCd 송신자코드 Hyphen에서 발급한 업체코드
      * @param recvCd recvCd 수신자코드 '0'+3자리은행코드, 하나은행:0081, 농협:0011, HYPHEN통합서버:0998, HYPHEN배치대행서버:0997 등..
      * @param infoCd 파일종류구분코드 계좌등록:R00(I0R), 자동이체:200(I03), 지급이체(송금):300(I03), 증빙자료:Y00(IY0, AY0), 증빙자료-사후점검:Y06(IY6), 계좌변경접수결과:Y01(IY1),
-     *               배치대행-증빙등록(AY0), 배치대행-자동이체(A02), 배치대행-계좌등록(A0R)
-     * @param dtoList Dto리스트 계좌등록:DtoReg, 자동이체:DtoBill, 지급이체:DtoPay, 증빙자료:DtoPrf
+     *               배치대행-증빙등록(AY0), 배치대행-자동이체(A02), 배치대행-계좌등록(A0R), 배치성실시간-송금이체(BR3)
+     * @param dtoList Dto리스트 계좌등록:DtoReg (infoCd:R00, I0R, A0R 용), 자동이체:DtoBill (infoCd:200, I02, A02 용), 지급이체:DtoPay (infoCd:300, I03, BR3 용),
+     *                증빙자료:DtoPrf(infoCd:Y00, IY0. AY0 용), 증빙자료-사후점검:DtoAftPrf(infoCd:Y06, IY6 용), 계좌변경접수결과:DtoShift(infoCd:Y01, IY1 용)
      * @param saveDir 생성돤파일 저장할 디렉토리
      * @param runMode 동작모드 Y:운영 T:test
      * @return true:성공 false:실패
@@ -597,9 +609,11 @@ public class HpnBbnk {
     /**
      * 결과파일을 Dto 리스트로 변환
      * @param infoCd 파일종류구분코드 계좌등록결과:R00(I0R), 자동이체결과:200(I03), 지급이체(송금)결과:300(I03), 증빙자료등록결과:Y00(IY0, AY0), 증빙자료-사후점검:Y05(IY5), 증빙자료-사후점검-검증결과:Y06(IY6),
-     *               해지통보:Y03(IY3), 계좌변경접수요청:Y01(IY1), 계좌변경처리결과:Y02(IY2), 배치대행-증빙등록결과(AY0), 배치대행-계좌등록결과(A0R), 배치대행-자동이체결과(A02)
+     *               해지통보:Y03(IY3), 계좌변경접수요청:Y01(IY1), 계좌변경처리결과:Y02(IY2), 배치대행-증빙등록결과(AY0), 배치대행-계좌등록결과(A0R), 배치대행-자동이체결과(A02), 배치성실시간-송금이체(BR3)
      * @param srcFilePath 결과파일위치
-     * @return Dto리스트 계좌등록:DtoReg, 자동이체:DtoBill 등..
+     * @return Dto리스트 계좌등록:DtoReg (infoCd:R00, I0R, A0R 용), 자동이체:DtoBill (infoCd:200, I02, A02 용), 지급이체:DtoPay (infoCd:300, I03, BR3 용),
+     *                  증빙자료:DtoPrf(infoCd:Y00, IY0. AY0 용), 증빙자료-사후점검:DtoAftPrf(infoCd:Y05, IY5, Y06, IY6 용),  해지통보:DtoCanc(Y03, IY3 용)
+     *                  계좌변경접수/처리결과:DtoShift(infoCd:Y01, IY1, Y02, IY2 용)
      */
     public List<?> makeDtoList(String infoCd, String srcFilePath){
         List<?> dtoList = null ;
@@ -618,6 +632,10 @@ public class HpnBbnk {
             case "I03":
                 FfmPayCom payCom = new FfmPayCom();
                 dtoList = payCom.makeDtoList(srcFilePath);
+                break;
+            case "BR3":
+                FfmPayBtr payBtr = new FfmPayBtr();
+                dtoList = payBtr.makeDtoList(srcFilePath);
                 break;
             case "Y00":
             case "IY0":
@@ -668,12 +686,14 @@ public class HpnBbnk {
      * @param sendCd 송신자코드 '0'+3자리은행코드, 하나은행:0081, 농협:0011, HYPHEN통합서버:0998, HYPHEN배치대행서버:0997 등..
      * @param recvCd 수신자코드 Hyphen에서 발급한 업체코드
      * @param infoCd 파일종류구분코드 계좌등록결과:R00(I0R), 자동이체결과:200(I03), 지급이체(송금)결과:300(I03), 증빙자료등록결과:Y00(IY0), 증빙자료-사후점검:Y05(IY5), 증빙자료-사후점검-검증결과:Y06(IY6),
-     *               해지통보:Y03(IY3), 계좌변경접수요청:Y01(IY1), 계좌변경처리결과:Y02(IY2), 배치대행-증빙등록결과(AY0), 배치대행-계좌등록결과(A0R), 배치대행-자동이체결과(A02)
+     *               해지통보:Y03(IY3), 계좌변경접수요청:Y01(IY1), 계좌변경처리결과:Y02(IY2), 배치대행-증빙등록결과(AY0), 배치대행-계좌등록결과(A0R), 배치대행-자동이체결과(A02), 배치성실시간-송금이체(BR3)
      * @param seqNo 파일순번
      * @param sendDt 송신일자
      * @param saveDir 수신파일보관경로
      * @param runMode runMode 동작모드 Y:운영 T:test
-     * @return Dto리스트 계좌등록:DtoReg, 자동이체:DtoBill 등..
+     * @return Dto리스트 계좌등록:DtoReg (infoCd:R00, I0R, A0R 용), 자동이체:DtoBill (infoCd:200, I02, A02 용), 지급이체:DtoPay (infoCd:300, I03, BR3 용),
+     *                  증빙자료:DtoPrf(infoCd:Y00, IY0. AY0 용), 증빙자료-사후점검:DtoAftPrf(infoCd:Y05, IY5, Y06, IY6 용),  해지통보:DtoCanc(Y03, IY3 용)
+     *                  계좌변경접수/처리결과:DtoShift(infoCd:Y01, IY1, Y02, IY2 용)
      */
     public List<?> recvDataDto(String sendCd, String recvCd, String infoCd, String seqNo, String sendDt, String saveDir, String runMode){
         log.debug("[recvDataDto](START) sendCd="+sendCd+", recvCd="+recvCd+", infoCd="+infoCd+", seqNo="+seqNo+", sendDt="+sendDt+", saveDir="+saveDir+", runMode="+runMode);

@@ -1,7 +1,6 @@
 package com.hyphen.fbnk.bbnk.msg;
 
 import com.hyphen.fbnk.bbnk.Util;
-import com.hyphen.fbnk.bbnk.dto.DtoBill;
 import com.hyphen.fbnk.bbnk.dto.DtoPay;
 import com.hyphen.fbnk.bbnk.logging.Log;
 import com.hyphen.fbnk.bbnk.logging.LogFactory;
