@@ -22,16 +22,13 @@ public enum RtnCode {
     ERR_UNREGIST_SHOP   ("87"),
     ERR_ABNORMAL_MSG    ("88"),
     ERR_EB_OPEN         ("89"),
+    ERR_PASSWD          ("91"),
     ERR_ETC             ("99"),
     DEFAULT             ("XX");
 
     private final String code;
     public String getCode() {return code;}
-
-    RtnCode(String code) {
-        this.code = code;
-    }
-
+    RtnCode(String code) {this.code = code;}
     private static final List<RtnCode> RTN_CODE_LIST = Arrays.asList(RtnCode.values());
     public static RtnCode fromCode(String code){
         for (RtnCode rtnCode : RTN_CODE_LIST) {

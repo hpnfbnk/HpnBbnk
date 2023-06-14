@@ -88,6 +88,21 @@ public class MsgNego {
         return getMsg();
     }
 
+    public byte[] getMsgSendReq(String fType, long fSize, boolean zipYn, String passwd) throws UnsupportedEncodingException {
+        this.fType      = fType;
+        this.msgType    = MsgCode.MSG_TRANS_REQ.getCode();
+        this.srType     = MsgCode.MSG_TP_SND_REQ.getCode();
+        this.filler1    = String.format("%010d", fSize);
+        if(zipYn)   this.zipYn = MsgCode.MSG_TP_ZIP.getCode();
+
+        byte[] bPassWd = passwd.getBytes(MsgCode.MSG_ENCODE.getCode());
+        byte[] sndBuf = new byte[MsgNego.msgSize + bPassWd.length];
+        arraycopy(getMsg(), 0, sndBuf, 0, MsgNego.msgSize);
+        arraycopy(bPassWd, 0, sndBuf, MsgNego.msgSize, bPassWd.length);
+
+        return sndBuf;
+    }
+
     public byte[] getMsgFindFnmReq(String fType, MsgCode srType, String fnmInfo, FNmTp fNmTp) throws UnsupportedEncodingException {
         this.fType      = fType;
         this.msgType    = MsgCode.MSG_FINDFNM_REQ.getCode();
@@ -108,6 +123,24 @@ public class MsgNego {
         if(zipYn)   this.zipYn = MsgCode.MSG_TP_ZIP.getCode();
 
         return getMsg();
+    }
+
+    public byte[] getMsgRecvReq(String fType, String fromDt, String toDt, MsgCode tpReq, MsgCode fRng, String seqNo, boolean zipYn, String passwd) throws UnsupportedEncodingException {
+        this.fType      = fType;
+        this.msgType    = MsgCode.MSG_TRANS_REQ.getCode();
+        this.srType     = tpReq.getCode();
+        this.fromDate   = fromDt;
+        this.toDate     = toDt;
+        this.reqType    = fRng.getCode();
+        this.filler1    = seqNo;
+        if(zipYn)   this.zipYn = MsgCode.MSG_TP_ZIP.getCode();
+
+        byte[] bPassWd = passwd.getBytes(MsgCode.MSG_ENCODE.getCode());
+        byte[] sndBuf = new byte[MsgNego.msgSize + bPassWd.length];
+        arraycopy(getMsg(), 0, sndBuf, 0, MsgNego.msgSize);
+        arraycopy(bPassWd, 0, sndBuf, MsgNego.msgSize, bPassWd.length);
+
+        return sndBuf;
     }
 
     public byte[] getMsgSendData(String fType, MsgCode msgType, int blockNo, int seqNo, boolean zipYn, int binLen, byte[] dataBuf) throws UnsupportedEncodingException {
