@@ -12,8 +12,8 @@ import java.util.List;
 
 public class HpnBbnk {
     //default setting
-    private String hpnSvrIpProd = "210.181.28.143"; //Hyphen 운영서버 IP (Internet)
-    private String hpnSvrIpTest = "210.181.28.96";  //Hyphen Test서버 IP (Internet)
+    private String hpnSvrIpProd = "121.138.30.10"; //Hyphen 운영서버 IP (Internet)
+    private String hpnSvrIpTest = "121.138.30.31";  //Hyphen Test서버 IP (Internet)
     private int hpnSvrPort      = 29994;            //Hyphen 서버 Port (Internet)
     private String hpnSvrIpPrf  = "121.138.30.10";  //Hyphen 증빙서버 IP (Internet)
     private int hpnSvrPortPrf   = 29995;            //Hyphen 증빙서버 Port (Internet)

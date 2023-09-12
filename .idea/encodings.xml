@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Encoding">
+    <file url="file://$PROJECT_DIR$/../../EduBankSnR/Recv/BRR_20230626_0011_R00.001.dat" charset="x-windows-949" />
+    <file url="file://$USER_HOME$/Desktop/KSNET_PrfClient_src/src/egateClient.c" charset="x-windows-949" />
+    <file url="file://$USER_HOME$/Desktop/KSNET_PrfClient_src/src/eutil.c" charset="x-windows-949" />
+    <file url="file://$USER_HOME$/Desktop/KSNET_PrfClient_src/src/parentlib.c" charset="x-windows-949" />
+    <file url="file://$USER_HOME$/Desktop/KSNET_PrfClient_src/src/sutil.c" charset="x-windows-949" />
     <file url="file://$PROJECT_DIR$/sample/200ComRecv.txt" charset="x-windows-949" />
     <file url="file://$PROJECT_DIR$/sample/300ComPay.txt" charset="x-windows-949" />
     <file url="file://$PROJECT_DIR$/sample/ABRQ20220627_A0040084R00.001" charset="x-windows-949" />
