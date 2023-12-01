@@ -288,7 +288,7 @@ List<DtoPay> dtoPayList = (List<DtoPay>) hpnBbnk.recvDataDto("0081", "A004", "30
 - [HYPHEN 통합(v1004)_파일포맷.xlsx](https://hpnfbnk.github.io/HpnBbnk/HYPHEN통합(v1004)_파일포맷.xlsx) : HYPHEN-공통 파일포맷(HYPHEN 타입)
 - [HYPHEN 통합(금결원호환v2001)_파일포맷.docx](https://hpnfbnk.github.io/HpnBbnk/HYPHEN통합(금결원호환v2001)_파일포맷.docx) : HYPHEN-공통 파일포맷(금결원호환 타입)
 - [출금이체정보_통합관리시스템_전산설계서(KSNET)V3.7.docx](https://hpnfbnk.github.io/HpnBbnk/출금이체정보_통합관리시스템_전산설계서(KSNET)V3.7.docx) : 계좌통합관리업무용 안내문서
-- [HYPHEN 배치대행_운영설명서(v3.2.0).docx](https://hpnfbnk.github.io/HpnBbnk/HYPHEN배치대행_운영설명서(v3.2.0).docx) : 배치대행 운영설명
+- [HYPHEN 배치대행_운영설명서(v3.2.1).docx](https://hpnfbnk.github.io/HpnBbnk/HYPHEN배치대행_운영설명서(v3.2.1).docx) : 배치대행 운영설명
 - [HYPHEN 배치대행_파일포맷(금결원호환)(v3.3.0).xlsx](https://hpnfbnk.github.io/HpnBbnk/HYPHEN배치대행_파일포맷(금결원호환)(v3.3.0).xlsx) : 배치대행이체 파일포맷
 - [출금이체정보_통합관리시스템_전산설계서(HYPHEN-배치대행업체용)V3.3.docx](https://hpnfbnk.github.io/HpnBbnk/출금이체정보_통합관리시스템_전산설계서(HYPHEN-배치대행업체용)V3.3.docx) : 계좌통합관리업무용 안내문서(배치대행업체용) 
 - [법인카드가맹점신표준전문(banking).xls](https://hpnfbnk.github.io/HpnBbnk/법인카드가맹점신표준전문(banking).xls) : 법인카드사용내역 파일포맷
