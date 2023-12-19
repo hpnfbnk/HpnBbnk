@@ -284,16 +284,18 @@ List<DtoPay> dtoPayList = (List<DtoPay>) hpnBbnk.recvDataDto("0081", "A004", "30
 
 ## 기타참고자료
 기타참고자료는 [/docs](https://github.com/hpnfbnk/HpnBbnk/tree/master/docs) 에 포함되 있습니다.
-- [배치펌뱅킹-은행포맷.zip](https://hpnfbnk.github.io/HpnBbnk/배치펌뱅킹-은행포맷.zip) : 은행별 파일포맷
+- [HYPHEN 배치펌뱅킹서비스용 연동Demon모듈](https://hpnfbnk.github.io/HpnBbnkDemon/HpnBbnkDemon-1.3.0.zip) : 주기적으로 반복 동작해 송수신을 자동으로 하는 독립적인 데몬형태모듈입니다.
 - [HYPHEN 통합(v1004)_파일포맷.xlsx](https://hpnfbnk.github.io/HpnBbnk/HYPHEN통합(v1004)_파일포맷.xlsx) : HYPHEN-공통 파일포맷(HYPHEN 타입)
 - [HYPHEN 통합(금결원호환v2001)_파일포맷.docx](https://hpnfbnk.github.io/HpnBbnk/HYPHEN통합(금결원호환v2001)_파일포맷.docx) : HYPHEN-공통 파일포맷(금결원호환 타입)
-- [출금이체정보_통합관리시스템_전산설계서(KSNET)V3.7.docx](https://hpnfbnk.github.io/HpnBbnk/출금이체정보_통합관리시스템_전산설계서(KSNET)V3.7.docx) : 계좌통합관리업무용 안내문서
 - [HYPHEN 배치대행_운영설명서(v3.2.1).docx](https://hpnfbnk.github.io/HpnBbnk/HYPHEN배치대행_운영설명서(v3.2.1).docx) : 배치대행 운영설명
 - [HYPHEN 배치대행_파일포맷(금결원호환)(v3.3.0).xlsx](https://hpnfbnk.github.io/HpnBbnk/HYPHEN배치대행_파일포맷(금결원호환)(v3.3.0).xlsx) : 배치대행이체 파일포맷
-- [출금이체정보_통합관리시스템_전산설계서(HYPHEN-배치대행업체용)V3.3.docx](https://hpnfbnk.github.io/HpnBbnk/출금이체정보_통합관리시스템_전산설계서(HYPHEN-배치대행업체용)V3.3.docx) : 계좌통합관리업무용 안내문서(배치대행업체용) 
-- [법인카드가맹점신표준전문(banking).xls](https://hpnfbnk.github.io/HpnBbnk/법인카드가맹점신표준전문(banking).xls) : 법인카드사용내역 파일포맷
 - [HYPHEN펌뱅킹_파일종류구분코드표.xlsx](https://hpnfbnk.github.io/HpnBbnk/HYPHEN펌뱅킹_파일종류구분코드표.xlsx) : 파일종류구분표
+- [법인카드가맹점신표준전문(banking).xls](https://hpnfbnk.github.io/HpnBbnk/법인카드가맹점신표준전문(banking).xls) : 법인카드사용내역 파일포맷
 - [배치펌뱅킹_오류코드정리.xlsx](https://hpnfbnk.github.io/HpnBbnk/배치펌뱅킹_오류코드정리.xlsx) : 오류코드표
 - [HYPHEN_Tcp송수신전문내역서.xls](https://hpnfbnk.github.io/HpnBbnk/HYPHEN_Tcp송수신전문내역서.xls) : 전문상세내역서
-- [HYPHEN 배치펌뱅킹서비스용 연동Demon모듈](https://hpnfbnk.github.io/HpnBbnkDemon/HpnBbnkDemon-1.3.0.zip) : 주기적으로 반복 동작해 송수신을 자동으로 하는 독립적인 데몬형태모듈입니다.
 - [HYPHEN 배치성-실시간 파일포맷](https://hpnfbnk.github.io/HpnBbnk/HYPHEN배치성-실시간_파일포맷.xlsx) : 배치성-실시간업무용(송금대행 등..) 파일포맷
+- [배치펌뱅킹-은행포맷.zip](https://hpnfbnk.github.io/HpnBbnk/배치펌뱅킹-은행포맷.zip) : 은행별 파일포맷
+- [출금이체정보_통합관리시스템_전산설계서(HYPHEN)V3.8.pdf](https://hpnfbnk.github.io/HpnBbnk/출금이체정보_통합관리시스템_전산설계서(HYPHEN)V3.8.pdf) : 금결원 PAYINFO 업무용 안내문서
+- [출금이체정보_통합관리시스템_전산설계서(HYPHEN-배치대행업체용)V3.3.docx](https://hpnfbnk.github.io/HpnBbnk/출금이체정보_통합관리시스템_전산설계서(HYPHEN-배치대행업체용)V3.3.docx) : 금결원 PAYINFO 업무용 안내문서(배치대행업체용) 
+
+
