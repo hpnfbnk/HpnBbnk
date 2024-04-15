@@ -5,6 +5,7 @@ import com.hyphen.fbnk.bbnk.logging.Log;
 import com.hyphen.fbnk.bbnk.logging.LogFactory;
 import com.hyphen.fbnk.bbnk.msg.FfmRegCom;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.Connection;
@@ -25,7 +26,149 @@ public class ProcBbdata {
 	private final String TBL_C04 = "COCA_INFO";
 	private final String TBL_C05 = "COCA_SETT";
 	private final String TBL_C06 = "COCA_LIMI";
-	
+	private final String TBL_SRHST = "HYPHEN_BBNK_HST";
+
+	public boolean srHst2DB(DtoDBSRHst srHst, String db_driver, String db_url, String db_user, String db_pass){
+		boolean result = true;
+		Connection db_con;
+		PreparedStatement pst_hst = null;
+
+		//log.debug("[srHst2DB] "+srHst);
+		//log.debug("[srHst2DB] db_driver=["+db_driver+"], db_url=["+db_url+"], db_user=["+db_user+"], db_pass=["+db_pass+"]");
+		db_con = Connect2DB(db_driver, db_url, db_user, db_pass);
+		if(db_con == null)	return false;
+		try {
+			db_con.setAutoCommit(true);
+			String Qry = "INSERT INTO " + TBL_SRHST + " (SEND_DATE, SEND_TIME, BT_INFO_CODE, SEND_CODE, RECV_CODE, SEQ_NUMB," +
+					"FILE_NAME, SR_TP, SUCCESS_FLAG, ADD_INFO1, ADD_INFO2, ADD_INFO3, ADD_INFO4, ADD_INFO5) " +
+					"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ";
+			pst_hst = db_con.prepareStatement(Qry);
+			pst_hst.setString(1, srHst.getSEND_DATE());
+			pst_hst.setString(2, srHst.getSEND_TIME());
+			pst_hst.setString(3, srHst.getBT_INFO_CODE());
+			pst_hst.setString(4, srHst.getSEND_CODE());
+			pst_hst.setString(5, srHst.getRECV_CODE());
+			pst_hst.setString(6, srHst.getSEQ_NUMB());
+			pst_hst.setString(7, srHst.getFILE_NAME());
+			pst_hst.setString(8, srHst.getSR_TP());
+			pst_hst.setString(9, srHst.getSUCCESS_FLAG());
+			pst_hst.setString(10, srHst.getADD_INFO1());
+			pst_hst.setString(11, srHst.getADD_INFO2());
+			pst_hst.setString(12, srHst.getADD_INFO3());
+			pst_hst.setLong(13, srHst.getADD_INFO4());
+			pst_hst.setLong(14, srHst.getADD_INFO5());
+			if(pst_hst.executeUpdate() != 1) log.error("[srHst2DB] INSERT WORK FAIL ~!!");
+		} catch (SQLException e) {
+			log.error("[srHst2DB] "+ e);
+			result = false;
+		} finally {
+			if(pst_hst != null)	try{pst_hst.close();} catch (SQLException ignored){}
+		}
+
+		try{db_con.close();} catch (SQLException ignored){}
+		if(result)	log.debug("[srHst2DB](SUCCESS)");
+		else        log.debug("[srHst2DB](FAIL)");
+
+		return result;
+	}
+
+	public boolean srHst2DB(DtoFileList dtoFileList, String srTp, String db_driver, String db_url, String db_user, String db_pass){
+		boolean result = true;
+		Connection db_con;
+		PreparedStatement pst_hst = null;
+
+		//log.debug("[srHst2DB] db_driver=["+db_driver+"], db_url=["+db_url+"], db_user=["+db_user+"], db_pass=["+db_pass+"]");
+		db_con = Connect2DB(db_driver, db_url, db_user, db_pass);
+		if(db_con == null)	return false;
+		try {
+			db_con.setAutoCommit(true);
+			String Qry = "INSERT INTO " + TBL_SRHST + " (SEND_DATE, SEND_TIME, BT_INFO_CODE, SEND_CODE, RECV_CODE, SEQ_NUMB," +
+					"FILE_NAME, SR_TP, SUCCESS_FLAG, ADD_INFO1, ADD_INFO2, ADD_INFO3, ADD_INFO4, ADD_INFO5) " +
+					"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ";
+			pst_hst = db_con.prepareStatement(Qry);
+			pst_hst.setString(1, Util.getCurDtTm().substring(0, 8));
+			pst_hst.setString(2, Util.getCurDtTm().substring(8));
+			pst_hst.setString(3, dtoFileList.getInfoCd());
+			pst_hst.setString(4, dtoFileList.getSendCd());
+			pst_hst.setString(5, dtoFileList.getRecvCd());
+			pst_hst.setString(6, dtoFileList.getSeqNo());
+			pst_hst.setString(7, new File(dtoFileList.getFilePath()).getName());
+			pst_hst.setString(8, srTp);
+			pst_hst.setString(9, dtoFileList.isRetYn() ? "Y" : "N");
+			pst_hst.setString(10, "");
+			pst_hst.setString(11, "");
+			pst_hst.setString(12, "");
+			pst_hst.setLong(13, 0L);
+			pst_hst.setLong(14, 0L);
+			if(pst_hst.executeUpdate() != 1) log.error("[srHst2DB] INSERT WORK FAIL ~!!");
+		} catch (SQLException e) {
+			log.error("[srHst2DB] "+ e);
+			result = false;
+		} finally {
+			if(pst_hst != null)	try{pst_hst.close();} catch (SQLException ignored){}
+		}
+		try{db_con.close();} catch (SQLException ignored){}
+		if(result)	log.debug("[srHst2DB](SUCCESS)");
+		else        log.debug("[srHst2DB](FAIL)");
+
+		return result;
+	}
+
+	public boolean srHst2DB(List<DtoFileList> dtoFileLists, String srTp, String db_driver, String db_url, String db_user, String db_pass){
+		boolean result = true;
+		boolean commit_flag = true;
+		Connection db_con;
+		PreparedStatement pst_hst = null;
+
+		//log.debug("[srHst2DB] db_driver=["+db_driver+"], db_url=["+db_url+"], db_user=["+db_user+"], db_pass=["+db_pass+"]");
+		db_con = Connect2DB(db_driver, db_url, db_user, db_pass);
+		if(db_con == null)	return false;
+		try {
+			db_con.setAutoCommit(false);
+			String Qry = "INSERT INTO " + TBL_SRHST + " (SEND_DATE, SEND_TIME, BT_INFO_CODE, SEND_CODE, RECV_CODE, SEQ_NUMB," +
+					"FILE_NAME, SR_TP, SUCCESS_FLAG, ADD_INFO1, ADD_INFO2, ADD_INFO3, ADD_INFO4, ADD_INFO5) " +
+					"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ";
+			pst_hst = db_con.prepareStatement(Qry);
+			for(DtoFileList dtoFileList : dtoFileLists){
+				pst_hst.setString(1, Util.getCurDtTm().substring(0, 8));
+				pst_hst.setString(2, Util.getCurDtTm().substring(8));
+				pst_hst.setString(3, dtoFileList.getInfoCd());
+				pst_hst.setString(4, dtoFileList.getSendCd());
+				pst_hst.setString(5, dtoFileList.getRecvCd());
+				pst_hst.setString(6, dtoFileList.getSeqNo());
+				pst_hst.setString(7, new File(dtoFileList.getFilePath()).getName());
+				pst_hst.setString(8, srTp);
+				pst_hst.setString(9, dtoFileList.isRetYn() ? "Y" : "N");
+				pst_hst.setString(10, "");
+				pst_hst.setString(11, "");
+				pst_hst.setString(12, "");
+				pst_hst.setLong(13, 0L);
+				pst_hst.setLong(14, 0L);
+				if(pst_hst.executeUpdate() != 1){
+					log.error("[srHst2DB] INSERT WORK FAIL ~!!");
+					commit_flag = false;
+					break;
+				}
+			}//loop end.
+			if(commit_flag)	db_con.commit();
+			else {
+				db_con.rollback();
+				result = false;
+			}
+		} catch (SQLException e) {
+			log.error("[srHst2DB] "+ e);
+			try{db_con.rollback();} catch (SQLException ignored){}
+			result = false;
+		} finally {
+			if(pst_hst != null)	try{pst_hst.close();} catch (SQLException ignored){}
+		}
+		try{db_con.close();} catch (SQLException ignored){}
+		if(result)	log.debug("[srHst2DB](SUCCESS)");
+		else        log.debug("[srHst2DB](FAIL)");
+
+		return result;
+	}
+
 	public boolean corpCard2DB(String file_path, String info_cd, String db_driver, String db_url, String db_user, String db_pass) {
 		boolean result = true;
 		Connection db_con;
@@ -66,27 +209,6 @@ public class ProcBbdata {
 		return result;
 	}
 
-	/*
-	private byte[] readLineByte(FileInputStream fis) throws IOException{
-		byte[] tmpByte = new byte[1024*2];
-		int iByte = 0, byteCnt = 0;
-		
-		while(true){
-			iByte = fis.read();
-			if(iByte<0)	break;	//EOF
-			if(iByte==13||iByte==10)	break;	//CR||LF
-			tmpByte[byteCnt] = (byte) iByte;
-
-			byteCnt++;
-			if(byteCnt>(1024*2))	break;
-		}
-		byte[] resultByte = new byte[byteCnt];
-		System.arraycopy(tmpByte, 0, resultByte, 0, byteCnt);
-		
-		return resultByte;
-	}
-	 */
-	
 	private boolean Approval2DB(String file_path, Connection db_con) {
 		boolean result = true;
 		boolean commit_flag = true;

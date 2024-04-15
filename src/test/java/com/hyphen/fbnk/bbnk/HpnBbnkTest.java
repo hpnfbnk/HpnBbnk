@@ -4,6 +4,7 @@ import com.hyphen.fbnk.bbnk.dto.*;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +12,11 @@ import static org.junit.Assert.*;
 
 public class HpnBbnkTest {
     HpnBbnk hpnBbnk;
+
+    private String dbDriver = "org.gjt.mm.mysql.Driver";
+    private String dbUrl = "jdbc:mysql://172.32.12.117:3306/test_db";
+    private String dbUser = "root";
+    private String dbPass = "mypwd";
 
     @Before
     public void setup(){
@@ -21,35 +27,56 @@ public class HpnBbnkTest {
 
     //@Test
     public void sendData() {
+        String sendCd   = "A002";
+        String recvCd   = "0181";
+        String infoCd   = "R00";
+        String filePath = "./sample/sample_R00_SND.txt";
+        String runMode  = "T";
+
         //송신
-        boolean result = hpnBbnk.sendData("A002","0181", "R00", "./sample/sample_R00_SND.txt", "T", "");
+        //boolean result = hpnBbnk.sendData("A002","0181", "R00", "./sample/sample_R00_SND.txt", "T", "");
         //boolean result = hpnBbnk.sendData("A002","0181", "R00", "./sample/sample_R00_SND.txt", "T", "tcUF3A2WRsW1BdQNlrZlsQ");
-        //boolean result = hpnBbnk.sendData("A002","0181", "R00", "./sample/sample_R00_SND.txt", "T");
+        boolean result = hpnBbnk.sendData(sendCd,recvCd, infoCd, filePath, runMode);
         if(result) System.out.println("hpnBbnk.sendData() : SUCCESS");
         else System.out.println("hpnBbnk.sendData() : FAIL");
+
+        //송신내역 DB 기록
+        /*
+        DtoDBSRHst srhst = new DtoDBSRHst(infoCd, sendCd, recvCd, "001", new File(filePath).getName(), "S", result);
+        System.out.println(srhst);
+        result = new ProcBbdata().srHst2DB(srhst, dbDriver, dbUrl, dbUser, dbPass);
+        if(result) System.out.println("hpnBbnk.srHst2DB() : SUCCESS");
+        else System.out.println("hpnBbnk.srHst2DB() : FAIL");
+         */
+
         assertTrue(result);
     }
 
     //@Test
     public void sendDataMulti() {
+        boolean result;
         List<DtoFileList> sendDataLists = new ArrayList<>();
-        sendDataLists.add(new DtoFileList("20220323", "R00", "A002", "0181", "001", "./sample/ABRQ20190323_B10_011_123456_KB1.001", false, ""));
-        sendDataLists.add(new DtoFileList("20220323", "200", "A003", "0181", "001", "./sample/ABRQ20190323_C10_004_BK123456_KB3.001", false, ""));
-        sendDataLists.add(new DtoFileList("20220323", "Y00", "A002", "0181", "001", "./sample/prf.dat", false, ""));
+        sendDataLists.add(new DtoFileList("20240415", "R00", "A002", "0181", "001", "./sample/ABRQ20190323_B10_011_123456_KB1.001", false, ""));
+        sendDataLists.add(new DtoFileList("20240415", "200", "A002", "0181", "001", "./sample/ABRQ20190323_C10_004_BK123456_KB3.001", false, ""));
+        //sendDataLists.add(new DtoFileList("20240415", "Y00", "A002", "0181", "001", "./sample/prf.dat", false, ""));
         //sendDataLists.add(new DtoFileList("20220323", "R00", "A002", "0181", "001", "./sample/ABRQ20190323_B10_011_123456_KB1.001", false, "tcUF3A2WRsW1BdQNlrZlsQ"));
         //sendDataLists.add(new DtoFileList("20220323", "200", "A003", "0181", "001", "./sample/ABRQ20190323_C10_004_BK123456_KB3.001", false, "123456789"));
         //sendDataLists.add(new DtoFileList("20220323", "Y00", "A002", "0181", "001", "./sample/prf.dat", false));
         //sendDataLists.add(new DtoFileList("20220323", "R00", "A001", "0181", "001", "./sample/ABRQ20190323_B10_011_123456_KB1.001", false));
         //sendDataLists.add(new DtoFileList("20220323", "200", "A002", "0181", "001", "./sample/ABRQ20190323_C10_004_BK123456_KB3.001", false));
         //sendDataLists.add(new DtoFileList("20220323", "Y00", "A001", "0181", "001", "./sample/prf.dat", false));
-
         List<DtoFileList> resultLists = hpnBbnk.sendDataMulti("A002", sendDataLists, "", "T");
-        for (DtoFileList resultList : resultLists)
+        for (DtoFileList resultList : resultLists){
             System.out.println("hpnBbnk.sendDataMulti : "+resultList);
+            //송신내역 DB 기록
+            //result = new ProcBbdata().srHst2DB(resultList, "S", dbDriver, dbUrl, dbUser, dbPass);
+            //if(result) System.out.println("hpnBbnk.srHst2DB() : SUCCESS"); else System.out.println("hpnBbnk.srHst2DB() : FAIL");
+        }
+
         assertNotNull(resultLists);
     }
 
-    @Test
+    //@Test
     public void getRecvList() {
         //일반적인 조건으로 수신목록 조회(최근1주일사이에 조회자가 아직 한번도 수신하지 않은 것들에 대한 수신목록 조회요청)
         List<DtoSRList> dtoSRLists = hpnBbnk.getRecvList("A002", "T", "");
@@ -78,11 +105,19 @@ public class HpnBbnkTest {
     //@Test
     public void recvData() {
         //수신
-        boolean result = hpnBbnk.recvData("0026", "A002", "R00", "001", "20230614", "./sample/A002_RCV.txt", "T", "");
+        boolean result = hpnBbnk.recvData("0011", "A002", "R00", "001", "20240415", "./sample/A002_RCV.txt", "T", "");
         //boolean result = hpnBbnk.recvData("0181", "A002", "R00", "001", "20230613", "./sample/A002_RCV.txt", "T", "tcUF3A2WRsW1BdQNlrZlsQ");
         //boolean result = hpnBbnk.recvData("0181", "A002", "R00", "001", "20230613", "./sample/A002_RCV.txt", "T");
         if(result) System.out.println("hpnBbnk.recvData : SUCCESS");
         else System.out.println("hpnBbnk.recvData : FAIL");
+        //수신내역 DB 기록
+        /*
+        DtoDBSRHst srhst = new DtoDBSRHst("R00", "0011", "A002", "001", new File("./sample/A002_RCV.txt").getName(), "R", result);
+        System.out.println(srhst);
+        result = new ProcBbdata().srHst2DB(srhst, dbDriver, dbUrl, dbUser, dbPass);
+        if(result) System.out.println("hpnBbnk.srHst2DB() : SUCCESS");
+        else System.out.println("hpnBbnk.srHst2DB() : FAIL");
+        */
         assertTrue(result);
     }
 
@@ -102,16 +137,24 @@ public class HpnBbnkTest {
         assertNotNull(resultLists);
     }
 
-    //@Test
+    @Test
     public void recvDataMulti(){
-        List<DtoFileList> dtoFileLists = hpnBbnk.recvDataMulti("A002", "9999", "ZZZ", "20230613", "20230613", "A", "", "./sample", "T", "");
+        boolean result;
+        List<DtoFileList> dtoFileLists = hpnBbnk.recvDataMulti("A002", "9999", "ZZZ", "20240410", "20240415", "A", "", "./sample", "T", "");
         //List<DtoFileList> dtoFileLists = hpnBbnk.recvDataMulti("A002", "9999", "ZZZ", "20230613", "20230613", "A", "", "./sample", "T", "tcUF3A2WRsW1BdQNlrZlsQ");
         //List<DtoFileList> dtoFileLists = hpnBbnk.recvDataMulti("A002", "9999", "ZZZ", "20230613", "20230613", "A", "", "./sample", "T");
         if(dtoFileLists.isEmpty())
             System.out.println("hpnBbnk.recvDataMulti : NO_DATA");
-        else
-            for(DtoFileList dtoFileList : dtoFileLists) System.out.println("hpnBbnk.recvDataMulti : "+dtoFileList);
-        assertNotNull(dtoFileLists);
+        else {
+            for (DtoFileList dtoFileList : dtoFileLists) {
+                System.out.println("hpnBbnk.recvDataMulti : " + dtoFileList);
+                //수신내역 DB 기록
+                result = new ProcBbdata().srHst2DB(dtoFileList, "R", dbDriver, dbUrl, dbUser, dbPass);
+                if (result) System.out.println("hpnBbnk.srHst2DB() : SUCCESS");
+                else System.out.println("hpnBbnk.srHst2DB() : FAIL");
+            }
+            assertNotNull(dtoFileLists);
+        }
     }
 
     //@Test
