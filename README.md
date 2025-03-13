@@ -300,7 +300,7 @@ List<DtoPay> dtoPayList = (List<DtoPay>) hpnBbnk.recvDataDto("0081", "A004", "30
 - [HYPHEN 배치대행_파일포맷(금결원호환)(v3.3.0).xlsx](https://hpnfbnk.github.io/HpnBbnk/HYPHEN배치대행_파일포맷(금결원호환)(v3.3.0).xlsx) : 배치대행이체 파일포맷
 - [HYPHEN펌뱅킹_파일종류구분코드표.xlsx](https://hpnfbnk.github.io/HpnBbnk/HYPHEN펌뱅킹_파일종류구분코드표.xlsx) : 파일종류구분표
 - [법인카드가맹점신표준전문(banking).xls](https://hpnfbnk.github.io/HpnBbnk/법인카드가맹점신표준전문(banking).xls) : 법인카드사용내역 파일포맷
-- [법인카드가맹점신표준전문(확장포맷-1.5.0).xls](https://hpnfbnk.github.io/HpnBbnk/법인카드가맹점신표준전문(확장포맷-1.5.0).xls) : 법인카드사용내역 파일포맷(확장)
+- [법인카드가맹점신표준전문(확장포맷-1.5.0).xls](https://hpnfbnk.github.io/HpnBbnk/법인카드가맹점신표준전문(확장포맷-1.5.0).xls) : 법인카드사용내역 파일포맷(확장) 
 - [법인카드사용내역-샘플.zip](https://hpnfbnk.github.io/HpnBbnk/법인카드사용내역-샘플.zip) : 법인카드사용내역 샘플 data file
 - [배치펌뱅킹_오류코드정리.xlsx](https://hpnfbnk.github.io/HpnBbnk/배치펌뱅킹_오류코드정리.xlsx) : 오류코드표
 - [HYPHEN_Tcp송수신전문내역서.xls](https://hpnfbnk.github.io/HpnBbnk/HYPHEN_Tcp송수신전문내역서.xls) : 전문상세내역서
