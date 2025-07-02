@@ -244,7 +244,7 @@ public class UpdnLib {
             RtnCode transRtnCode = chkRplyMsg(sockClnt, MsgCode.MSG_TRANS_REP);
 
             long dataMsgCnt = 0L;
-            String rcvFilePath = null;
+            String tmpFilePath = null, recvFilePath = null;
             byte[] dataBuf = new byte[Define.MAX_DATA_MSG_SIZE.getValue()];
             byte[] missList = new byte[Define.MAX_SEQ_CNT.getValue()];
             Arrays.fill(missList, (byte) 0x30);
@@ -262,20 +262,22 @@ public class UpdnLib {
                     //송신정보해석(첫번째 자료송신전문일때만 송신정보 세팅)
                     if(dataMsgCnt==1L){
                         //저장파일명조립
-                        rcvFilePath = makeRFilePath(negoMsg, fNmTp, recvDir);
+                        recvFilePath = makeRFilePath(negoMsg, fNmTp, recvDir);
+                        //임시파일명조립
+                        Random rand = new Random();
+                        tmpFilePath = recvFilePath+"."+rand.nextInt(999999);
+
                         //수신목록세팅
                         if(fNmTp==FNmTp.KEDUFIN){
-                            FnmTpKEduFine tpKEduFnm = new FnmTpKEduFine(new File(rcvFilePath).getName());
+                            FnmTpKEduFine tpKEduFnm = new FnmTpKEduFine(new File(recvFilePath).getName());
                             rcvFileList = new DtoFileList(Util.getCurDtTm().substring(0, 8), tpKEduFnm.getInfoCd(), tpKEduFnm.getSendCd(), tpKEduFnm.getRecvCd(),
-                                    negoMsg.getFiller1().trim(), rcvFilePath, true);
+                                    negoMsg.getFiller1().trim(), recvFilePath, true);
                         }
                         else
                             rcvFileList = new DtoFileList(Util.getCurDtTm().substring(0, 8), negoMsg.getfType().trim(), negoMsg.getSendCd().trim(),
-                                    negoMsg.getRecvCd().trim(), negoMsg.getFiller1().trim(), rcvFilePath, true);
+                                    negoMsg.getRecvCd().trim(), negoMsg.getFiller1().trim(), recvFilePath, true);
 
-                        //압축감안
-                        if(zipYn)   rcvFilePath = rcvFilePath + ".gz";
-                        dataFp = new RandomAccessFile(rcvFilePath, "rw");
+                        dataFp = new RandomAccessFile(tmpFilePath, "rw");
                     }
                     arraycopy(rcvMsg, MsgNego.msgSize, dataBuf, 0, negoMsg.getBinLen());
                     dataFp.write(dataBuf, 0, negoMsg.getBinLen());
@@ -301,11 +303,15 @@ public class UpdnLib {
                 else if(negoMsg.getMsgType()==MsgCode.MSG_PARTEND_REQ && transRtnCode==RtnCode.FINE){
                     if(dataFp!=null)    dataFp.close();
                     dataMsgCnt = 0L;
-                    if(zipYn) {
-                        String zipFilePath = rcvFilePath;
-                        rcvFilePath = rcvFilePath.substring(0, rcvFilePath.length()-3);
-                        log.debug("[rcvDataMulti] zipFilePath="+zipFilePath+", rcvFilePath="+rcvFilePath);
-                        decompressFile(zipFilePath, rcvFilePath);
+                    if(zipYn)   decompressFile(tmpFilePath, recvFilePath);
+                    else{
+                        File srcFile = new File(tmpFilePath);
+                        File desFile = new File(recvFilePath);
+                        if(desFile.exists()) {
+                            if(!desFile.delete())   throw new Exception("Fail delete file["+recvFilePath+"]");
+                        }
+                        if(!srcFile.renameTo(desFile))  throw new Exception("Fail rename file["+tmpFilePath+"=>"+recvFilePath+"]");
+                        log.debug("[rcvDataMulti] "+tmpFilePath+" =rename=> "+recvFilePath);
                     }
                     sndRplyMsg(sockClnt, negoMsg, MsgCode.MSG_PARTEND_REP, RtnCode.FINE);
                     //수신목록에 입력
@@ -365,7 +371,7 @@ public class UpdnLib {
             RtnCode transRtnCode = chkRplyMsg(sockClnt, MsgCode.MSG_TRANS_REP);
 
             long dataMsgCnt = 0L;
-            String rcvFilePath = null;
+            String tmpFilePath = null, recvFilePath = null;
             byte[] dataBuf = new byte[Define.MAX_DATA_MSG_SIZE.getValue()];
             byte[] missList = new byte[Define.MAX_SEQ_CNT.getValue()];
             Arrays.fill(missList, (byte) 0x30);
@@ -383,20 +389,22 @@ public class UpdnLib {
                     //송신정보해석(첫번째 자료송신전문일때만 송신정보 세팅)
                     if(dataMsgCnt==1L){
                         //저장파일명조립
-                        rcvFilePath = makeRFilePath(negoMsg, fNmTp, recvDir);
+                        recvFilePath = makeRFilePath(negoMsg, fNmTp, recvDir);
+                        //임시파일명조립
+                        Random rand = new Random();
+                        tmpFilePath = recvFilePath+"."+rand.nextInt(999999);
+
                         //수신목록세팅
                         if(fNmTp==FNmTp.KEDUFIN){
-                            FnmTpKEduFine tpKEduFnm = new FnmTpKEduFine(new File(rcvFilePath).getName());
+                            FnmTpKEduFine tpKEduFnm = new FnmTpKEduFine(new File(recvFilePath).getName());
                             rcvFileList = new DtoFileList(Util.getCurDtTm().substring(0, 8), tpKEduFnm.getInfoCd(), tpKEduFnm.getSendCd(), tpKEduFnm.getRecvCd(),
-                                    negoMsg.getFiller1().trim(), rcvFilePath, true);
+                                    negoMsg.getFiller1().trim(), recvFilePath, true);
                         }
                         else
                             rcvFileList = new DtoFileList(Util.getCurDtTm().substring(0, 8), negoMsg.getfType().trim(), negoMsg.getSendCd().trim(),
-                                    negoMsg.getRecvCd().trim(), negoMsg.getFiller1().trim(), rcvFilePath, true);
+                                    negoMsg.getRecvCd().trim(), negoMsg.getFiller1().trim(), recvFilePath, true);
 
-                        //압축감안
-                        if(zipYn)   rcvFilePath = rcvFilePath + ".gz";
-                        dataFp = new RandomAccessFile(rcvFilePath, "rw");
+                        dataFp = new RandomAccessFile(tmpFilePath, "rw");
                     }
                     arraycopy(rcvMsg, MsgNego.msgSize, dataBuf, 0, negoMsg.getBinLen());
                     dataFp.write(dataBuf, 0, negoMsg.getBinLen());
@@ -422,11 +430,15 @@ public class UpdnLib {
                 else if(negoMsg.getMsgType()==MsgCode.MSG_PARTEND_REQ && transRtnCode==RtnCode.FINE){
                     if(dataFp!=null)    dataFp.close();
                     dataMsgCnt = 0L;
-                    if(zipYn) {
-                        String zipFilePath = rcvFilePath;
-                        rcvFilePath = rcvFilePath.substring(0, rcvFilePath.length()-3);
-                        log.debug("[rcvDataMulti] zipFilePath="+zipFilePath+", rcvFilePath="+rcvFilePath);
-                        decompressFile(zipFilePath, rcvFilePath);
+                    if(zipYn) decompressFile(tmpFilePath, recvFilePath);
+                    else{
+                        File srcFile = new File(tmpFilePath);
+                        File desFile = new File(recvFilePath);
+                        if(desFile.exists()) {
+                            if(!desFile.delete())   throw new Exception("Fail delete file["+recvFilePath+"]");
+                        }
+                        if(!srcFile.renameTo(desFile))  throw new Exception("Fail rename file["+tmpFilePath+"=>"+recvFilePath+"]");
+                        log.debug("[rcvDataMulti] "+tmpFilePath+" =rename=> "+recvFilePath);
                     }
                     sndRplyMsg(sockClnt, negoMsg, MsgCode.MSG_PARTEND_REP, RtnCode.FINE);
                     //수신목록에 입력

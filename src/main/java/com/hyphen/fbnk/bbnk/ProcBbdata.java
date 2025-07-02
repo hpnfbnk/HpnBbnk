@@ -245,7 +245,7 @@ public class ProcBbdata {
 				log.trace("[Approval2DB] data_code=["+data_rec.getData_code()+"], company_id=["+data_rec.getCompany_id()+"], send_dt=["+data_rec.getSend_dt().trim()+
 						"], seq_no=["+data_rec.getSeq_no()+"], ApprNo=["+data_rec.getApprNo()+"], MerchName=["+data_rec.getMerchName()+"]");
 
-				pst_c01.setString(1, data_rec.getData_code());				
+				pst_c01.setString(1, data_rec.getData_code());
 				pst_c01.setString(2, data_rec.getCompany_id());
 				pst_c01.setString(3, data_rec.getSend_dt());
 				pst_c01.setString(4, data_rec.getSeq_no());
