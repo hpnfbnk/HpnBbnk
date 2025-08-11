@@ -1,20 +1,16 @@
 package com.hyphen.fbnk.bbnk;
 
+import com.hyphen.fbnk.bbnk.define.Define;
 import com.hyphen.fbnk.bbnk.dto.*;
 import com.hyphen.fbnk.bbnk.logging.Log;
 import com.hyphen.fbnk.bbnk.logging.LogFactory;
-import com.hyphen.fbnk.bbnk.msg.FfmRegCom;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -27,6 +23,7 @@ public class ProcBbdata {
 	private final String TBL_C05 = "COCA_SETT";
 	private final String TBL_C06 = "COCA_LIMI";
 	private final String TBL_SRHST = "HYPHEN_BBNK_HST";
+	private final String TBL_DZN = "FI_CARD_TRADE";
 
 	public boolean srHst2DB(DtoDBSRHst srHst, String db_driver, String db_url, String db_user, String db_pass){
 		boolean result = true;
@@ -208,6 +205,299 @@ public class ProcBbdata {
 
 		return result;
 	}
+
+	public boolean corpCard2DB(String file_path, String info_cd, String db_driver, String db_url, String db_user, String db_pass, String db_type, String ext_val_1, String ext_val_2, String ext_val_3) {
+		boolean result = true;
+		Connection db_con;
+		log.debug("[CorpCard2DB] file_path=["+file_path+"], info_cd=["+info_cd+"], db_driver=["+db_driver+"], db_url=["+db_url+"], db_user=["+db_user+"], db_pass=["+db_pass+"], " +
+				"db+type=["+db_type+"], ext_val_1=["+ext_val_1+"], ext_val_2=["+ext_val_2+"], ext_val_3=["+ext_val_3+"]");
+
+		db_con = Connect2DB(db_driver, db_url, db_user, db_pass);
+		if(db_con == null)	return false;
+
+		if(db_type.equals(Define.DBTP_DZN.getCode())){
+			switch (info_cd) {
+				case "C01":
+					if (!Approval2DbDzn(file_path, db_con, ext_val_1)) result = false;
+					break;
+				case "C02":
+					if (!Acquire2DbDzn(file_path, db_con, ext_val_1)) result = false;
+					break;
+				default:
+					log.error("Unenrolled info_cd : " + info_cd);
+					break;
+			}
+
+
+		}
+
+		try{db_con.close();} catch (SQLException ignored){}
+
+		if(result)	log.debug("[CorpCard2DB](SUCCESS) file_path=["+file_path+"], info_cd=["+info_cd+"]");
+		else        log.debug("[CorpCard2DB](FAIL) file_path=["+file_path+"], info_cd=["+info_cd+"]");
+
+		return result;
+	}
+
+	private boolean Approval2DbDzn(String file_path, Connection db_con, String tmp_tblnm) {
+		boolean result = true;
+		boolean commit_flag = true;
+		PreparedStatement pst_c01 = null;
+		DtoDRecC01 data_rec = null;
+		FileInputStream fis = null;
+		byte[] dataBuf = null;
+		String DznTbnlNm = tmp_tblnm.length() < 3 ? TBL_DZN : tmp_tblnm;
+
+
+		try {
+			db_con.setAutoCommit(false);
+			String Qry = "INSERT INTO " + DznTbnlNm + " (FINPRODUCT_NO, BANK_CD, TRAN_DT, TRAN_TM, NO_SQ, COMPANY_CD,  TRAN_AMT, TRAN_NM, INSM_MM, " +
+					"APRVL_NO, APRVL_YN, BIZR_NO, DOCU_PROC_YN, INSERT_DT, INSERT_TM, INSERT_ID, PC_CD, APRVL_VAT_AMT, BIZTP_CD, BIZTP_NM, TEL_NO, " +
+					"POST_NO, BASE_ADDR, SPPRC_AMT, VAT_AMT, TIP_AMT, EXRT_RT, FRGN_USE_YN, EXCH_CD, DTL_ADDR, VAT_PROC_YN, FRCS_CEO_NM, INCOMEOC_AMT, " +
+					"INCOMEOC_TAX_AMT, CARD_TP, CNCL_DT, FRCS_NO, DOLLAR_CVRS_AMT, KRW_CVRS_AMT, PRCH_TKBAK_NO, CLOSE_DT, DOCU_AMT, VAT_TP_AMT, " +
+					"VAT_TP_VAT_AMT, SRC_TM, INSERT_DTS) " +
+					"VALUES (?, ?, ?, ?, ?, ?,  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ";
+			pst_c01 = db_con.prepareStatement(Qry);
+
+			int i_cnt = 0;
+			fis = new FileInputStream(file_path);
+			while(true) {
+				i_cnt++;
+				dataBuf = Util.readLineByte(fis);
+				if(dataBuf.length==0)	break;
+				if(!new String(dataBuf, 0, 1).equals("D"))	continue;
+
+				data_rec = new DtoDRecC01(dataBuf);
+				if(!data_rec.isNormal()) {
+					log.error("[Approval2DbDzn] dataBuf("+i_cnt+")=["+new String(dataBuf)+"]");
+					log.error("[Approval2DbDzn] "+data_rec.getAbnormalMsg());
+					commit_flag = false;
+					break;
+				}
+				//해외사용여부(Abroad) 값이 국내(A)인 경우만 처리
+				if(!data_rec.getAbroad().equals("A"))	continue;
+
+				log.trace("[Approval2DbDzn] company_id:"+data_rec.getCompany_id()+", send_dt:"+data_rec.getSend_dt().trim()+
+						", seq_no:"+data_rec.getSeq_no()+", ApprNo:"+data_rec.getApprNo()+", MerchName:"+data_rec.getMerchName()+
+						", Abroad:"+data_rec.getAbroad()+", ApClass:"+data_rec.getApClass());
+
+				pst_c01.setString( 1, data_rec.getCardNo());		//FINPRODUCT_NO
+				pst_c01.setString( 2, data_rec.getCardIni());		//BANK_CD
+				pst_c01.setString( 3, data_rec.getTransDate().replace("/", ""));	//TRAN_DT
+				pst_c01.setString( 4, data_rec.getTransTime());	//TRAN_TM
+				pst_c01.setString( 5, data_rec.getSeq_no());		//NO_SQ
+				pst_c01.setString( 6, "1000");					//COMPANY_CD
+				pst_c01.setDouble( 7, data_rec.getApprTot());		//TRAN_AMT
+				pst_c01.setString( 8, data_rec.getMerchName());	//TRAN_NM
+				pst_c01.setString( 9, String.valueOf(data_rec.getInstMonth()));	//INSM_MM
+				pst_c01.setString(10, data_rec.getApprNo());		//APRVL_NO
+				if(data_rec.getApClass().equals("A"))		pst_c01.setString(11, "Y"); //APRVL_YN
+				else if(data_rec.getApClass().equals("B"))	pst_c01.setString(11, "N");
+				pst_c01.setString(12, data_rec.getMerchBizNo());	//BIZR_NO
+				pst_c01.setString(13, "N");					//DOCU_PROC_YN
+				pst_c01.setString(14, data_rec.getSend_dt().replace("/", ""));	//INSERT_DT
+				pst_c01.setString(15, getCurTm().substring(8));	//INSERT_TM
+				pst_c01.setString(16, "HYPHEN");				//INSERT_ID
+				pst_c01.setString(17, "1001");					//PC_CD
+				pst_c01.setDouble(18, data_rec.getVAT());			//APRVL_VAT_AMT
+				pst_c01.setString(19, data_rec.getMCCCode());		//BIZTP_CD
+				pst_c01.setString(20, data_rec.getMCCName());		//BIZTP_NM
+				pst_c01.setString(21, data_rec.getMerchTel());	//TEL_NO
+				pst_c01.setString(22, data_rec.getMerchZipCode());//POST_NO
+				pst_c01.setString(23, data_rec.getMerchAddr1());	//BASE_ADDR
+				pst_c01.setDouble(24, data_rec.getApprAmt());		//SPPRC_AMT
+				pst_c01.setDouble(25, data_rec.getVAT());			//VAT_AMT
+				pst_c01.setDouble(26, data_rec.getTips());		//TIP_AMT
+				pst_c01.setDouble(27, data_rec.getApprExch());	//EXRT_RT
+				pst_c01.setString(28, data_rec.getAbroad());		//FRGN_USE_YN
+				pst_c01.setString(29, data_rec.getCurrCode());	//EXCH_CD
+				pst_c01.setString(30, data_rec.getMerchAddr2());	//DTL_ADDR
+				pst_c01.setString(31, data_rec.getVAT() != 0 ? "Y" : "N");	//VAT_PROC_YN
+				pst_c01.setString(32, data_rec.getMaster());		//FRCS_CEO_NM
+				pst_c01.setDouble(33, 0);						//INCOMEOC_AMT
+				pst_c01.setDouble(34, 0);						//INCOMEOC_TAX_AMT
+				pst_c01.setString(35, data_rec.getCardType2());	//CARD_TP
+				pst_c01.setString(36, data_rec.getApClass().equals("B") ? data_rec.getTransDate().replace("/", "") : "");	//CNCL_DT
+				pst_c01.setString(37, data_rec.getMerchNo());		//FRCS_NO
+				pst_c01.setDouble(38, 0);						//DOLLAR_CVRS_AMT
+				pst_c01.setDouble(39, 0);						//KRW_CVRS_AMT
+				pst_c01.setString(40, data_rec.getCollNo());		//PRCH_TKBAK_NO
+				pst_c01.setString(41, data_rec.getMerchCessDate());//CLOSE_DT
+				pst_c01.setDouble(42, 0);						//DOCU_AMT
+				pst_c01.setDouble(43, 0);						//VAT_TP_AMT
+				pst_c01.setDouble(44, 0);						//VAT_TP_VAT_AMT
+				pst_c01.setString(45, "00:00:00");				//SRC_TM
+				pst_c01.setDate(  46, getCurSqlDate());			//INSERT_DTS
+
+				if(pst_c01.executeUpdate() != 1) {
+					log.error("[Approval2DbDzn] INSERT WORK FAIL ~!!");
+					commit_flag = false;
+					break;
+				}
+				if(i_cnt > 1000000)	break;
+			}/*while end.*/
+
+			if(commit_flag)	db_con.commit();
+			else {
+				db_con.rollback();
+				result = false;
+			}
+		} catch (IOException | SQLException e) {
+			log.error("[CorpCard2DB] "+ e);
+			try{db_con.rollback();} catch (SQLException ignored){}
+			result = false;
+		} finally {
+			if(pst_c01 != null)	try{pst_c01.close();} catch (SQLException ignored){}
+			if(fis != null)	try{fis.close();} catch (IOException ignored){}
+		}
+
+		return result;
+	}
+
+	private boolean Acquire2DbDzn(String file_path, Connection db_con, String tmp_tblnm) {
+		boolean result = true;
+		boolean commit_flag = true;
+		PreparedStatement pst_c02 = null;
+		DtoDRecC02 data_rec = null;
+		FileInputStream fis = null;
+		byte[] dataBuf = null;
+		String DznTbnlNm = tmp_tblnm.length() < 3 ? TBL_DZN : tmp_tblnm;
+
+		try {
+			db_con.setAutoCommit(false);
+			String Qry = "INSERT INTO " + DznTbnlNm + " (FINPRODUCT_NO, BANK_CD, TRAN_DT, TRAN_TM, NO_SQ, COMPANY_CD,  TRAN_AMT, TRAN_NM, INSM_MM, " +
+					"APRVL_NO, APRVL_YN, BIZR_NO, DOCU_PROC_YN, INSERT_DT, INSERT_TM, INSERT_ID, PC_CD, APRVL_VAT_AMT, BIZTP_CD, BIZTP_NM, TEL_NO, " +
+					"POST_NO, BASE_ADDR, SPPRC_AMT, VAT_AMT, TIP_AMT, EXRT_RT, FRGN_USE_YN, EXCH_CD, DTL_ADDR, VAT_PROC_YN, FRCS_CEO_NM, INCOMEOC_AMT, " +
+					"INCOMEOC_TAX_AMT, CARD_TP, CNCL_DT, FRCS_NO, DOLLAR_CVRS_AMT, KRW_CVRS_AMT, PRCH_TKBAK_NO, CLOSE_DT, DOCU_AMT, VAT_TP_AMT, " +
+					"VAT_TP_VAT_AMT, SRC_TM, INSERT_DTS) " +
+					"VALUES (?, ?, ?, ?, ?, ?,  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ";
+			pst_c02 = db_con.prepareStatement(Qry);
+
+			int i_cnt = 0;
+			fis = new FileInputStream(file_path);
+			while(true) {
+				i_cnt++;
+				dataBuf = Util.readLineByte(fis);
+				if(dataBuf.length==0)	break;
+				if(!new String(dataBuf, 0, 1).equals("D"))	continue;
+
+				data_rec = new DtoDRecC02(dataBuf);
+				if(!data_rec.isNormal()) {
+					log.error("[Acquire2DbDzn] dataBuf("+i_cnt+")=["+new String(dataBuf)+"]");
+					log.error("[Acquire2DbDzn] "+data_rec.getAbnormalMsg());
+					commit_flag = false;
+					break;
+				}
+				//해외사용여부(Abroad) 값이 해외(B)이거나, 해외사용여부(Abroad) 값이 국내(A)이고 매입취소(B)인 건만 처리
+				if(!(data_rec.getAbroad().equals("B")||(data_rec.getAbroad().equals("A")&&data_rec.getApClass().equals("B"))))	continue;
+
+				log.trace("[Acquire2DbDzn] company_id:"+data_rec.getCOMPANY_ID()+", send_dt:"+data_rec.getSEND_DT().trim()+
+						", seq_no:"+data_rec.getSEQ_NO()+", ApprNo:"+data_rec.getApprNo()+", MerchName:"+data_rec.getMerchName()+
+						", Abroad:"+data_rec.getAbroad()+", ApClass:"+data_rec.getApClass());
+
+				pst_c02.setString( 1, data_rec.getCardNo());		//FINPRODUCT_NO
+				pst_c02.setString( 2, data_rec.getCardIni());		//BANK_CD
+				pst_c02.setString( 3, data_rec.getApprDate().replace("/", ""));	//TRAN_DT
+				pst_c02.setString( 4, data_rec.getPurchTime());	//TRAN_TM
+				pst_c02.setString( 5, data_rec.getSEQ_NO());		//NO_SQ
+				pst_c02.setString( 6, "1000");					//COMPANY_CD
+				pst_c02.setDouble( 7, data_rec.getPurchTot());	//TRAN_AMT
+				pst_c02.setString( 8, data_rec.getMerchName());	//TRAN_NM
+				pst_c02.setString( 9, "");						//INSM_MM
+				pst_c02.setString(10, data_rec.getApprNo());		//APRVL_NO
+				if(data_rec.getApClass().equals("A"))		pst_c02.setString(11, "Y"); //APRVL_YN
+				else if(data_rec.getApClass().equals("B"))	pst_c02.setString(11, "N");
+				else pst_c02.setString(11, data_rec.getApClass());
+				pst_c02.setString(12, data_rec.getMerchBizNo());	//BIZR_NO
+				pst_c02.setString(13, "N");					//DOCU_PROC_YN
+				pst_c02.setString(14, data_rec.getSEND_DT().replace("/", ""));	//INSERT_DT
+				pst_c02.setString(15, getCurTm().substring(8));	//INSERT_TM
+				pst_c02.setString(16, "HYPHEN");				//INSERT_ID
+				pst_c02.setString(17, "1001");					//PC_CD
+				pst_c02.setDouble(18, data_rec.getVAT());			//APRVL_VAT_AMT
+				pst_c02.setString(19, data_rec.getMccCode());		//BIZTP_CD
+				pst_c02.setString(20, data_rec.getMccName());		//BIZTP_NM
+				pst_c02.setString(21, data_rec.getMerchTel());	//TEL_NO
+				pst_c02.setString(22, data_rec.getMerchZipcode());//POST_NO
+				pst_c02.setString(23, data_rec.getMerchAddr1());	//BASE_ADDR
+				pst_c02.setDouble(24, data_rec.getApprTot());		//SPPRC_AMT
+				pst_c02.setDouble(25, data_rec.getVAT());			//VAT_AMT
+				pst_c02.setDouble(26, data_rec.getTips());		//TIP_AMT
+				pst_c02.setDouble(27, data_rec.getAcquExch());	//EXRT_RT
+				pst_c02.setString(28, data_rec.getAbroad());		//FRGN_USE_YN
+				pst_c02.setString(29, data_rec.getCurrCode());	//EXCH_CD
+				pst_c02.setString(30, data_rec.getMerchAddr2());	//DTL_ADDR
+				pst_c02.setString(31, data_rec.getVAT() != 0 ? "Y" : "N");	//VAT_PROC_YN
+				pst_c02.setString(32, data_rec.getMaster());		//FRCS_CEO_NM
+				pst_c02.setDouble(33, 0);						//INCOMEOC_AMT
+				pst_c02.setDouble(34, 0);						//INCOMEOC_TAX_AMT
+				pst_c02.setString(35, "");						//CARD_TP
+				pst_c02.setString(36, data_rec.getApClass().equals("B") ? data_rec.getPurchDate().replace("/", "") : "");	//CNCL_DT
+				pst_c02.setString(37, "");						//FRCS_NO
+				pst_c02.setDouble(38, data_rec.getUSDAcquTot());	//DOLLAR_CVRS_AMT
+				pst_c02.setDouble(39, data_rec.getAcquTot());		//KRW_CVRS_AMT
+				pst_c02.setString(40, "");						//PRCH_TKBAK_NO
+				pst_c02.setString(41, data_rec.getMerchCessDate());//CLOSE_DT
+				pst_c02.setDouble(42, 0);						//DOCU_AMT
+				pst_c02.setDouble(43, 0);						//VAT_TP_AMT
+				pst_c02.setDouble(44, 0);						//VAT_TP_VAT_AMT
+				pst_c02.setString(45, "00:00:00");				//SRC_TM
+				pst_c02.setDate(  46, getCurSqlDate());			//INSERT_DTS
+
+				if(pst_c02.executeUpdate() != 1) {
+					log.error("[Acquire2DbDzn] INSERT WORK FAIL ~!!");
+					commit_flag = false;
+					break;
+				}
+
+				if(i_cnt > 1000000)	break;
+			}/*while end.*/
+
+			if(commit_flag)	db_con.commit();
+			else {
+				db_con.rollback();
+				result = false;
+			}
+		} catch (IOException e) {
+			log.error("[CorpCard2DB] "+e);
+			try{db_con.rollback();} catch (SQLException ignored){}
+			result = false;
+		} catch(SQLException e) {
+			log.error("[CorpCard2DB] "+e);
+			try{db_con.rollback();} catch (SQLException ignored){}
+			result = false;
+		} finally {
+			if(pst_c02 != null)	try{pst_c02.close();} catch (SQLException ignored){}
+			if(fis != null)	try{fis.close();} catch (IOException ignored){}
+		}
+
+		return result;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	private boolean Approval2DB(String file_path, Connection db_con) {
 		boolean result = true;
@@ -862,6 +1152,11 @@ public class ProcBbdata {
 		DateFormat	format  = new SimpleDateFormat("yyyyMMddHHmmss");
 		String date			= format.format(cal.getTime());
 		return date;
+	}
+
+	private Date getCurSqlDate(){
+		java.util.Date utilDate = Calendar.getInstance().getTime();
+		return new java.sql.Date(utilDate.getTime());
 	}
 
 

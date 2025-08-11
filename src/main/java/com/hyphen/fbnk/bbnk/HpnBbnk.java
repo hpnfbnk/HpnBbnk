@@ -647,6 +647,63 @@ public class HpnBbnk {
     }
 
     /**
+     * Hyphen에서 여러개 파일 수신하여 DB에 insert (DB처리타입 구분)
+     * @param finderCd 조회자코드
+     * @param targetCd 조회대상자코드 모든대상자:9999)
+     * @param infoCd 조회대상파일종류 모든종류:ZZZ 계좌등록:R00, 자동이체:200, 지급이체(송금):300, 증빙자료:Y00 등..
+     * @param fromDt 조회범위-시작일자 YYYYMMDD
+     * @param toDt 조회범위-종료일자 YYYYMMDD
+     * @param findRng 조회범위-수신여부 미수신건만:E 모두:A
+     * @param sFNmTp 파일명타입 KSNET타입:"", K-edufine타입:KEDU
+     * @param recvDir 수신파일저장 디렉토리
+     * @param runMode 동작모드 Y:운영 T:test
+     * @param dbDriver JDBC Driver
+     * @param dbUrl JDBC Url
+     * @param dbUser DB user id
+     * @param dbPass DB user password
+     * @param senderPwd 통신용 비밀번호(기본적으로 통신용 별도비번 필요없음, 필요시 HYPHEN에 등록요청 후 사용)
+     * @param dbType DB처리타입  DZN:더존타입                 
+     * @param extVal1 추가인자1  dbType=DZN(더존타입)일 경우 사용자정의 TABLE명
+     * @param extVal2 추가인자2
+     * @param extVal3 추가인자3                
+     * @return 수신처리결과목록
+     */
+    public List<DtoFileList> recvDataMulti2DB(String finderCd, String targetCd, String infoCd, String fromDt, String toDt, String findRng, String sFNmTp, String recvDir, String runMode, String dbDriver, String dbUrl, String dbUser, String dbPass, String senderPwd, String dbType, String extVal1, String extVal2, String extVal3) {
+        log.debug("[recvDataMulti2DB](START) sendCd=" + finderCd + ", recvCd=" + targetCd + ", infoCd=" + infoCd + ", fromDt=" + fromDt + ", toDt=" + toDt + ", findRng=" + findRng + ", sFNmTp=" + sFNmTp + ", recvDir=" + recvDir + ", runMode=" + runMode);
+
+        String ipAddr   = getUseIpAddr(infoCd, runMode, false);
+        int port        = getUsePort(infoCd, runMode, false);
+        EncTp encTp     = getUseEncTp(infoCd, false);
+
+        fromDt  = fromDt.length()==8 ? fromDt.substring(2) : fromDt ;
+        toDt    = toDt.length()==8 ? toDt.substring(2) : toDt ;
+        MsgCode fRng    = findRng.equals(MsgCode.MSG_TP_REQ_ALL.getCode()) ? MsgCode.MSG_TP_REQ_ALL : MsgCode.MSG_TP_REQ_YET;
+        //파일명타입
+        FNmTp fNmTp;
+        if(sFNmTp.equals(FNmTp.KEDUFIN.getCode()))  fNmTp = FNmTp.KEDUFIN;
+        else fNmTp = FNmTp.DEFAULT;
+
+        UpdnLib updnLib = new UpdnLib();
+        List<DtoFileList> dtoFileLists = updnLib.rcvDataMulti(ipAddr, port, finderCd, targetCd, infoCd, fromDt, toDt, fRng, fNmTp, recvDir, this.zipYn, encTp, senderPwd);
+
+        ProcBbdata procBbdata = new ProcBbdata();
+        boolean dbResult = false;
+        if(dtoFileLists.isEmpty())
+            log.debug("[recvDataMulti2DB](NO_DATA) sendCd="+finderCd+", recvCd="+targetCd+", infoCd="+infoCd+", fromDt="+fromDt+", toDt="+toDt+", findRng="+findRng+", runMode="+runMode);
+        else{
+            log.debug("[recvDataMulti2DB](SUCCESS) sendCd="+finderCd+", recvCd="+targetCd+", infoCd="+infoCd+", fromDt="+fromDt+", toDt="+toDt+", findRng="+findRng+", runMode="+runMode);
+
+            for(DtoFileList dtoFileList : dtoFileLists){
+                dbResult = procBbdata.corpCard2DB(dtoFileList.getFilePath(), dtoFileList.getInfoCd(), dbDriver, dbUrl, dbUser, dbPass, dbType, extVal1, extVal2, extVal3);
+                dtoFileList.setRetYn(dbResult);
+                log.debug("[recvDataMulti2DB] "+dtoFileList);
+            }
+        }
+
+        return dtoFileLists;
+    }
+
+    /**
      * Hyphen에서 여러개 파일 수신하여 DB에 insert (법인카드사용내역에 한하여..)
      * @param finderCd 조회자코드
      * @param targetCd 조회대상자코드 모든대상자:9999)

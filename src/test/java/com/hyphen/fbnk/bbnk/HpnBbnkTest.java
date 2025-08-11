@@ -92,7 +92,7 @@ public class HpnBbnkTest {
     //@Test
     public void recvList() {
         //목록조회
-        List<DtoSRList> dtoSRLists = hpnBbnk.recvList("7333", "9999", "ZZZ", "20250530", "20250530", "L", "A", "T", "");
+        List<DtoSRList> dtoSRLists = hpnBbnk.recvList("4802", "9999", "ZZZ", "20250708", "20250708", "L", "A", "T", "");
         //List<DtoSRList> dtoSRLists = hpnBbnk.recvList("A002", "9999", "ZZZ", "20230606", "20230613", "M", "E", "T", "tcUF3A2WRsW1BdQNlrZlsQ");
         //List<DtoSRList> dtoSRLists = hpnBbnk.recvList("A002", "9999", "ZZZ", "20230606", "20230613", "M", "E", "T");
         if(dtoSRLists.isEmpty())
@@ -206,19 +206,22 @@ public class HpnBbnkTest {
 
     //@Test
     public void recvDataMulti2DB(){
-        String sendCd   = "9999";
-        String recvCd   = "A002";
+        String sendCd   = "1096";
+        String recvCd   = "A001";
         String infoCd   = "ZZZ";
-        String sendDt   = "20230613";
+        String sendDt   = "20250811";
         String runMode  = "T";
         String dbDriver = "org.gjt.mm.mysql.Driver";
         String dbUrl = "jdbc:mysql://localhost:3306/test?serverTimezone=Asia/Seoul&useSSL=false";
         String dbUser = "myid";
         String dbPass = "Mypwd`0203";
+        String dbType   = "DZN";
+        String dbTblNm  = "";
 
         List<DtoFileList> dtoFileLists = hpnBbnk.recvDataMulti2DB(recvCd, sendCd, infoCd, sendDt, sendDt, "E", "", "./sample", runMode, dbDriver, dbUrl, dbUser, dbPass, "");
         //List<DtoFileList> dtoFileLists = hpnBbnk.recvDataMulti2DB(recvCd, sendCd, infoCd, sendDt, sendDt, "E", "", "./sample", runMode, dbDriver, dbUrl, dbUser, dbPass, "tcUF3A2WRsW1BdQNlrZlsQ");
         //List<DtoFileList> dtoFileLists = hpnBbnk.recvDataMulti2DB(recvCd, sendCd, infoCd, sendDt, sendDt, "E", "", "./sample", runMode, dbDriver, dbUrl, dbUser, dbPass);
+        //List<DtoFileList> dtoFileLists = hpnBbnk.recvDataMulti2DB(recvCd, sendCd, infoCd, sendDt, sendDt, "E", "", "./sample", runMode, dbDriver, dbUrl, dbUser, dbPass, "", dbType, dbTblNm, "", "");
         if(dtoFileLists.isEmpty())
             System.out.println("hpnBbnk.recvDataMulti2DB : NO_DATA");
         else

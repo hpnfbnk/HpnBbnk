@@ -13,6 +13,7 @@ public enum Define {
     INFOCD_ALL          ("ZZZ", 0, (byte)0x00),
     TARGETCD_ALL        ("9999", 0, (byte)0x00),
     EXP_ZIP             (".gz", 0, (byte)0x00),
+    DBTP_DZN            ("DZN", 0, (byte)0x00),
     C_STX               ("", 0, (byte)0x02),
     C_ETX               ("", 0, (byte)0x03);
 
