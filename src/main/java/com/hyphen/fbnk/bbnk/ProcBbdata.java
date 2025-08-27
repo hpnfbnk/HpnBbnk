@@ -282,11 +282,11 @@ public class ProcBbdata {
 						", Abroad:"+data_rec.getAbroad()+", ApClass:"+data_rec.getApClass());
 
 				pst_c01.setString( 1, data_rec.getCardNo());		//FINPRODUCT_NO
-				pst_c01.setString( 2, data_rec.getCardIni());		//BANK_CD
+				pst_c01.setString( 2, getKftcCrdsCd(data_rec.getCardIni()));		//BANK_CD
 				pst_c01.setString( 3, data_rec.getTransDate().replace("/", ""));	//TRAN_DT
 				pst_c01.setString( 4, data_rec.getTransTime());	//TRAN_TM
 				pst_c01.setString( 5, data_rec.getSeq_no());		//NO_SQ
-				pst_c01.setString( 6, "1000");					//COMPANY_CD
+				pst_c01.setString( 6, "0000000");				//COMPANY_CD
 				pst_c01.setDouble( 7, data_rec.getApprTot());		//TRAN_AMT
 				pst_c01.setString( 8, data_rec.getMerchName());	//TRAN_NM
 				pst_c01.setString( 9, String.valueOf(data_rec.getInstMonth()));	//INSM_MM
@@ -396,11 +396,11 @@ public class ProcBbdata {
 						", Abroad:"+data_rec.getAbroad()+", ApClass:"+data_rec.getApClass());
 
 				pst_c02.setString( 1, data_rec.getCardNo());		//FINPRODUCT_NO
-				pst_c02.setString( 2, data_rec.getCardIni());		//BANK_CD
+				pst_c02.setString( 2, getKftcCrdsCd(data_rec.getCardIni()));		//BANK_CD
 				pst_c02.setString( 3, data_rec.getApprDate().replace("/", ""));	//TRAN_DT
 				pst_c02.setString( 4, data_rec.getPurchTime());	//TRAN_TM
 				pst_c02.setString( 5, data_rec.getSEQ_NO());		//NO_SQ
-				pst_c02.setString( 6, "1000");					//COMPANY_CD
+				pst_c02.setString( 6, "0000000");				//COMPANY_CD
 				pst_c02.setDouble( 7, data_rec.getPurchTot());	//TRAN_AMT
 				pst_c02.setString( 8, data_rec.getMerchName());	//TRAN_NM
 				pst_c02.setString( 9, "");						//INSM_MM
@@ -1159,5 +1159,28 @@ public class ProcBbdata {
 		return new java.sql.Date(utilDate.getTime());
 	}
 
+	private String getKftcCrdsCd(String hpnCrdsCd){
+		String kftcCrdsCd;
+		switch (hpnCrdsCd) {
+			case "BC":	kftcCrdsCd = "361";	break;
+			case "KB":	kftcCrdsCd = "381";	break;
+			case "KE":	kftcCrdsCd = "374";	break;
+			case "SS":	kftcCrdsCd = "365";	break;
+			case "SH":	kftcCrdsCd = "366";	break;
+			case "HD":	kftcCrdsCd = "367";	break;
+			case "LO":	kftcCrdsCd = "368";	break;
+			case "FF":	kftcCrdsCd = "369";	break;
+			case "NH":	kftcCrdsCd = "371";	break;
+			case "KJ":	kftcCrdsCd = "364";	break;
+			case "JB":	kftcCrdsCd = "372";	break;
+			case "WC":	kftcCrdsCd = "041";	break;
+			case "HV":	kftcCrdsCd = "374";	break;
+			case "CT":	kftcCrdsCd = "370";	break;
+			case "JJ":	kftcCrdsCd = "373";	break;
+			case "00":	kftcCrdsCd = "999";	break;
+			default:	kftcCrdsCd = "999";	break;
+		}
+		return kftcCrdsCd;
+	}
 
 }

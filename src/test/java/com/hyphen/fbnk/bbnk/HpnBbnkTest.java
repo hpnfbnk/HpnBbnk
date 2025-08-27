@@ -92,8 +92,8 @@ public class HpnBbnkTest {
     //@Test
     public void recvList() {
         //목록조회
-        List<DtoSRList> dtoSRLists = hpnBbnk.recvList("4802", "9999", "ZZZ", "20250708", "20250708", "L", "A", "T", "");
-        //List<DtoSRList> dtoSRLists = hpnBbnk.recvList("A002", "9999", "ZZZ", "20230606", "20230613", "M", "E", "T", "tcUF3A2WRsW1BdQNlrZlsQ");
+        List<DtoSRList> dtoSRLists = hpnBbnk.recvList("A002", "9999", "ZZZ", "20250708", "20250708", "L", "A", "Y", "");
+        //List<DtoSRList> dtoSRLists = hpnBbnk.recvList("A002", "9999", "ZZZ", "20250821", "20250821", "M", "E", "T", "tcUF3A2WRsW1BdQNlrZlsQ");
         //List<DtoSRList> dtoSRLists = hpnBbnk.recvList("A002", "9999", "ZZZ", "20230606", "20230613", "M", "E", "T");
         if(dtoSRLists.isEmpty())
             System.out.println("hpnBbnk.recvList : NO_DATA");
@@ -207,7 +207,7 @@ public class HpnBbnkTest {
     //@Test
     public void recvDataMulti2DB(){
         String sendCd   = "1096";
-        String recvCd   = "A001";
+        String recvCd   = "A002";
         String infoCd   = "ZZZ";
         String sendDt   = "20250811";
         String runMode  = "T";
