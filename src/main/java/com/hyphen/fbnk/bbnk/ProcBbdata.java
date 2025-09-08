@@ -252,11 +252,12 @@ public class ProcBbdata {
 		try {
 			db_con.setAutoCommit(false);
 			String Qry = "INSERT INTO " + DznTbnlNm + " (FINPRODUCT_NO, BANK_CD, TRAN_DT, TRAN_TM, NO_SQ, COMPANY_CD,  TRAN_AMT, TRAN_NM, INSM_MM, " +
-					"APRVL_NO, APRVL_YN, BIZR_NO, DOCU_PROC_YN, INSERT_DT, INSERT_TM, INSERT_ID, PC_CD, APRVL_VAT_AMT, BIZTP_CD, BIZTP_NM, TEL_NO, " +
+					//"APRVL_NO, APRVL_YN, BIZR_NO, DOCU_PROC_YN, INSERT_DT, INSERT_TM, INSERT_ID, PC_CD, APRVL_VAT_AMT, BIZTP_CD, BIZTP_NM, TEL_NO, " +
+					"APRVL_NO, APRVL_YN, BIZR_NO, DOCU_PROC_YN, INSERT_DT, INSERT_TM, INSERT_ID, APRVL_VAT_AMT, BIZTP_CD, BIZTP_NM, TEL_NO, " +
 					"POST_NO, BASE_ADDR, SPPRC_AMT, VAT_AMT, TIP_AMT, EXRT_RT, FRGN_USE_YN, EXCH_CD, DTL_ADDR, VAT_PROC_YN, FRCS_CEO_NM, INCOMEOC_AMT, " +
 					"INCOMEOC_TAX_AMT, CARD_TP, CNCL_DT, FRCS_NO, DOLLAR_CVRS_AMT, KRW_CVRS_AMT, PRCH_TKBAK_NO, CLOSE_DT, DOCU_AMT, VAT_TP_AMT, " +
 					"VAT_TP_VAT_AMT, SRC_TM, INSERT_DTS) " +
-					"VALUES (?, ?, ?, ?, ?, ?,  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ";
+					"VALUES (?, ?, ?, ?, ?, ?,  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ";
 			pst_c01 = db_con.prepareStatement(Qry);
 
 			int i_cnt = 0;
@@ -298,36 +299,36 @@ public class ProcBbdata {
 				pst_c01.setString(14, data_rec.getSend_dt().replace("/", ""));	//INSERT_DT
 				pst_c01.setString(15, getCurTm().substring(8));	//INSERT_TM
 				pst_c01.setString(16, "HYPHEN");				//INSERT_ID
-				pst_c01.setString(17, "1001");					//PC_CD
-				pst_c01.setDouble(18, data_rec.getVAT());			//APRVL_VAT_AMT
-				pst_c01.setString(19, data_rec.getMCCCode());		//BIZTP_CD
-				pst_c01.setString(20, data_rec.getMCCName());		//BIZTP_NM
-				pst_c01.setString(21, data_rec.getMerchTel());	//TEL_NO
-				pst_c01.setString(22, data_rec.getMerchZipCode());//POST_NO
-				pst_c01.setString(23, data_rec.getMerchAddr1());	//BASE_ADDR
-				pst_c01.setDouble(24, data_rec.getApprAmt());		//SPPRC_AMT
-				pst_c01.setDouble(25, data_rec.getVAT());			//VAT_AMT
-				pst_c01.setDouble(26, data_rec.getTips());		//TIP_AMT
-				pst_c01.setDouble(27, data_rec.getApprExch());	//EXRT_RT
-				pst_c01.setString(28, data_rec.getAbroad());		//FRGN_USE_YN
-				pst_c01.setString(29, data_rec.getCurrCode());	//EXCH_CD
-				pst_c01.setString(30, data_rec.getMerchAddr2());	//DTL_ADDR
-				pst_c01.setString(31, data_rec.getVAT() != 0 ? "Y" : "N");	//VAT_PROC_YN
-				pst_c01.setString(32, data_rec.getMaster());		//FRCS_CEO_NM
-				pst_c01.setDouble(33, 0);						//INCOMEOC_AMT
-				pst_c01.setDouble(34, 0);						//INCOMEOC_TAX_AMT
-				pst_c01.setString(35, data_rec.getCardType2());	//CARD_TP
-				pst_c01.setString(36, data_rec.getApClass().equals("B") ? data_rec.getTransDate().replace("/", "") : "");	//CNCL_DT
-				pst_c01.setString(37, data_rec.getMerchNo());		//FRCS_NO
-				pst_c01.setDouble(38, 0);						//DOLLAR_CVRS_AMT
-				pst_c01.setDouble(39, 0);						//KRW_CVRS_AMT
-				pst_c01.setString(40, data_rec.getCollNo());		//PRCH_TKBAK_NO
-				pst_c01.setString(41, data_rec.getMerchCessDate());//CLOSE_DT
-				pst_c01.setDouble(42, 0);						//DOCU_AMT
-				pst_c01.setDouble(43, 0);						//VAT_TP_AMT
-				pst_c01.setDouble(44, 0);						//VAT_TP_VAT_AMT
-				pst_c01.setString(45, "00:00:00");				//SRC_TM
-				pst_c01.setDate(  46, getCurSqlDate());			//INSERT_DTS
+				//pst_c01.setString(17, "1001");					//PC_CD
+				pst_c01.setDouble(17, data_rec.getVAT());			//APRVL_VAT_AMT
+				pst_c01.setString(18, data_rec.getMCCCode());		//BIZTP_CD
+				pst_c01.setString(19, data_rec.getMCCName());		//BIZTP_NM
+				pst_c01.setString(20, data_rec.getMerchTel());	//TEL_NO
+				pst_c01.setString(21, data_rec.getMerchZipCode());//POST_NO
+				pst_c01.setString(22, data_rec.getMerchAddr1());	//BASE_ADDR
+				pst_c01.setDouble(23, data_rec.getApprAmt());		//SPPRC_AMT
+				pst_c01.setDouble(24, data_rec.getVAT());			//VAT_AMT
+				pst_c01.setDouble(25, data_rec.getTips());		//TIP_AMT
+				pst_c01.setDouble(26, data_rec.getApprExch());	//EXRT_RT
+				pst_c01.setString(27, data_rec.getAbroad());		//FRGN_USE_YN
+				pst_c01.setString(28, data_rec.getCurrCode());	//EXCH_CD
+				pst_c01.setString(29, data_rec.getMerchAddr2());	//DTL_ADDR
+				pst_c01.setString(30, data_rec.getVAT() != 0 ? "Y" : "N");	//VAT_PROC_YN
+				pst_c01.setString(31, data_rec.getMaster());		//FRCS_CEO_NM
+				pst_c01.setDouble(32, 0);						//INCOMEOC_AMT
+				pst_c01.setDouble(33, 0);						//INCOMEOC_TAX_AMT
+				pst_c01.setString(34, data_rec.getCardType2());	//CARD_TP
+				pst_c01.setString(35, data_rec.getApClass().equals("B") ? data_rec.getTransDate().replace("/", "") : "");	//CNCL_DT
+				pst_c01.setString(36, data_rec.getMerchNo());		//FRCS_NO
+				pst_c01.setDouble(37, 0);						//DOLLAR_CVRS_AMT
+				pst_c01.setDouble(38, 0);						//KRW_CVRS_AMT
+				pst_c01.setString(39, data_rec.getCollNo());		//PRCH_TKBAK_NO
+				pst_c01.setString(40, data_rec.getMerchCessDate());//CLOSE_DT
+				pst_c01.setDouble(41, 0);						//DOCU_AMT
+				pst_c01.setDouble(42, 0);						//VAT_TP_AMT
+				pst_c01.setDouble(43, 0);						//VAT_TP_VAT_AMT
+				pst_c01.setString(44, "00:00:00");				//SRC_TM
+				pst_c01.setDate(  45, getCurSqlDate());			//INSERT_DTS
 
 				if(pst_c01.executeUpdate() != 1) {
 					log.error("[Approval2DbDzn] INSERT WORK FAIL ~!!");
@@ -366,11 +367,12 @@ public class ProcBbdata {
 		try {
 			db_con.setAutoCommit(false);
 			String Qry = "INSERT INTO " + DznTbnlNm + " (FINPRODUCT_NO, BANK_CD, TRAN_DT, TRAN_TM, NO_SQ, COMPANY_CD,  TRAN_AMT, TRAN_NM, INSM_MM, " +
-					"APRVL_NO, APRVL_YN, BIZR_NO, DOCU_PROC_YN, INSERT_DT, INSERT_TM, INSERT_ID, PC_CD, APRVL_VAT_AMT, BIZTP_CD, BIZTP_NM, TEL_NO, " +
+					//"APRVL_NO, APRVL_YN, BIZR_NO, DOCU_PROC_YN, INSERT_DT, INSERT_TM, INSERT_ID, PC_CD, APRVL_VAT_AMT, BIZTP_CD, BIZTP_NM, TEL_NO, " +
+					"APRVL_NO, APRVL_YN, BIZR_NO, DOCU_PROC_YN, INSERT_DT, INSERT_TM, INSERT_ID, APRVL_VAT_AMT, BIZTP_CD, BIZTP_NM, TEL_NO, " +
 					"POST_NO, BASE_ADDR, SPPRC_AMT, VAT_AMT, TIP_AMT, EXRT_RT, FRGN_USE_YN, EXCH_CD, DTL_ADDR, VAT_PROC_YN, FRCS_CEO_NM, INCOMEOC_AMT, " +
 					"INCOMEOC_TAX_AMT, CARD_TP, CNCL_DT, FRCS_NO, DOLLAR_CVRS_AMT, KRW_CVRS_AMT, PRCH_TKBAK_NO, CLOSE_DT, DOCU_AMT, VAT_TP_AMT, " +
 					"VAT_TP_VAT_AMT, SRC_TM, INSERT_DTS) " +
-					"VALUES (?, ?, ?, ?, ?, ?,  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ";
+					"VALUES (?, ?, ?, ?, ?, ?,  ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ";
 			pst_c02 = db_con.prepareStatement(Qry);
 
 			int i_cnt = 0;
@@ -413,36 +415,36 @@ public class ProcBbdata {
 				pst_c02.setString(14, data_rec.getSEND_DT().replace("/", ""));	//INSERT_DT
 				pst_c02.setString(15, getCurTm().substring(8));	//INSERT_TM
 				pst_c02.setString(16, "HYPHEN");				//INSERT_ID
-				pst_c02.setString(17, "1001");					//PC_CD
-				pst_c02.setDouble(18, data_rec.getVAT());			//APRVL_VAT_AMT
-				pst_c02.setString(19, data_rec.getMccCode());		//BIZTP_CD
-				pst_c02.setString(20, data_rec.getMccName());		//BIZTP_NM
-				pst_c02.setString(21, data_rec.getMerchTel());	//TEL_NO
-				pst_c02.setString(22, data_rec.getMerchZipcode());//POST_NO
-				pst_c02.setString(23, data_rec.getMerchAddr1());	//BASE_ADDR
-				pst_c02.setDouble(24, data_rec.getApprTot());		//SPPRC_AMT
-				pst_c02.setDouble(25, data_rec.getVAT());			//VAT_AMT
-				pst_c02.setDouble(26, data_rec.getTips());		//TIP_AMT
-				pst_c02.setDouble(27, data_rec.getAcquExch());	//EXRT_RT
-				pst_c02.setString(28, data_rec.getAbroad());		//FRGN_USE_YN
-				pst_c02.setString(29, data_rec.getCurrCode());	//EXCH_CD
-				pst_c02.setString(30, data_rec.getMerchAddr2());	//DTL_ADDR
-				pst_c02.setString(31, data_rec.getVAT() != 0 ? "Y" : "N");	//VAT_PROC_YN
-				pst_c02.setString(32, data_rec.getMaster());		//FRCS_CEO_NM
-				pst_c02.setDouble(33, 0);						//INCOMEOC_AMT
-				pst_c02.setDouble(34, 0);						//INCOMEOC_TAX_AMT
-				pst_c02.setString(35, "");						//CARD_TP
-				pst_c02.setString(36, data_rec.getApClass().equals("B") ? data_rec.getPurchDate().replace("/", "") : "");	//CNCL_DT
-				pst_c02.setString(37, "");						//FRCS_NO
-				pst_c02.setDouble(38, data_rec.getUSDAcquTot());	//DOLLAR_CVRS_AMT
-				pst_c02.setDouble(39, data_rec.getAcquTot());		//KRW_CVRS_AMT
-				pst_c02.setString(40, "");						//PRCH_TKBAK_NO
-				pst_c02.setString(41, data_rec.getMerchCessDate());//CLOSE_DT
-				pst_c02.setDouble(42, 0);						//DOCU_AMT
-				pst_c02.setDouble(43, 0);						//VAT_TP_AMT
-				pst_c02.setDouble(44, 0);						//VAT_TP_VAT_AMT
-				pst_c02.setString(45, "00:00:00");				//SRC_TM
-				pst_c02.setDate(  46, getCurSqlDate());			//INSERT_DTS
+				//pst_c02.setString(17, "1001");					//PC_CD
+				pst_c02.setDouble(17, data_rec.getVAT());			//APRVL_VAT_AMT
+				pst_c02.setString(18, data_rec.getMccCode());		//BIZTP_CD
+				pst_c02.setString(19, data_rec.getMccName());		//BIZTP_NM
+				pst_c02.setString(20, data_rec.getMerchTel());	//TEL_NO
+				pst_c02.setString(21, data_rec.getMerchZipcode());//POST_NO
+				pst_c02.setString(22, data_rec.getMerchAddr1());	//BASE_ADDR
+				pst_c02.setDouble(23, data_rec.getApprTot());		//SPPRC_AMT
+				pst_c02.setDouble(24, data_rec.getVAT());			//VAT_AMT
+				pst_c02.setDouble(25, data_rec.getTips());		//TIP_AMT
+				pst_c02.setDouble(26, data_rec.getAcquExch());	//EXRT_RT
+				pst_c02.setString(27, data_rec.getAbroad());		//FRGN_USE_YN
+				pst_c02.setString(28, data_rec.getCurrCode());	//EXCH_CD
+				pst_c02.setString(29, data_rec.getMerchAddr2());	//DTL_ADDR
+				pst_c02.setString(30, data_rec.getVAT() != 0 ? "Y" : "N");	//VAT_PROC_YN
+				pst_c02.setString(31, data_rec.getMaster());		//FRCS_CEO_NM
+				pst_c02.setDouble(32, 0);						//INCOMEOC_AMT
+				pst_c02.setDouble(33, 0);						//INCOMEOC_TAX_AMT
+				pst_c02.setString(34, "");						//CARD_TP
+				pst_c02.setString(35, data_rec.getApClass().equals("B") ? data_rec.getPurchDate().replace("/", "") : "");	//CNCL_DT
+				pst_c02.setString(36, "");						//FRCS_NO
+				pst_c02.setDouble(37, data_rec.getUSDAcquTot());	//DOLLAR_CVRS_AMT
+				pst_c02.setDouble(38, data_rec.getAcquTot());		//KRW_CVRS_AMT
+				pst_c02.setString(39, "");						//PRCH_TKBAK_NO
+				pst_c02.setString(40, data_rec.getMerchCessDate());//CLOSE_DT
+				pst_c02.setDouble(41, 0);						//DOCU_AMT
+				pst_c02.setDouble(42, 0);						//VAT_TP_AMT
+				pst_c02.setDouble(43, 0);						//VAT_TP_VAT_AMT
+				pst_c02.setString(44, "00:00:00");				//SRC_TM
+				pst_c02.setDate(  45, getCurSqlDate());			//INSERT_DTS
 
 				if(pst_c02.executeUpdate() != 1) {
 					log.error("[Acquire2DbDzn] INSERT WORK FAIL ~!!");
@@ -473,31 +475,6 @@ public class ProcBbdata {
 
 		return result;
 	}
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 	private boolean Approval2DB(String file_path, Connection db_con) {
 		boolean result = true;
