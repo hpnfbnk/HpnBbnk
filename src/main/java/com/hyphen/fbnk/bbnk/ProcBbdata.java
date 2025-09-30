@@ -22,6 +22,7 @@ public class ProcBbdata {
 	private final String TBL_C04 = "COCA_INFO";
 	private final String TBL_C05 = "COCA_SETT";
 	private final String TBL_C06 = "COCA_LIMI";
+	private final String TBL_C07 = "COCA_HPSS";
 	private final String TBL_SRHST = "HYPHEN_BBNK_HST";
 	private final String TBL_DZN = "FI_CARD_TRADE";
 
@@ -193,6 +194,9 @@ public class ProcBbdata {
             case "C06":
                 if (!CardLimit2DB(file_path, db_con)) result = false;
                 break;
+			case "C07":
+				if (!CardHpss2DB(file_path, db_con)) result = false;
+				break;
             default:
                 log.error("Undefined info_cd : " + info_cd);
                 result = false;
@@ -227,10 +231,7 @@ public class ProcBbdata {
 					log.error("Unenrolled info_cd : " + info_cd);
 					break;
 			}
-
-
 		}
-
 		try{db_con.close();} catch (SQLException ignored){}
 
 		if(result)	log.debug("[CorpCard2DB](SUCCESS) file_path=["+file_path+"], info_cd=["+info_cd+"]");
@@ -1109,8 +1110,92 @@ public class ProcBbdata {
 		}
 		
 		return result;
-	}		
-	
+	}
+
+	private boolean CardHpss2DB(String file_path, Connection db_con) {
+		boolean result = true;
+		boolean commit_flag = true;
+		PreparedStatement pst_c07 = null;
+		DtoDRecC07 data_rec = null;
+		FileInputStream fis = null;
+		byte[] dataBuf = null;
+
+		try {
+			db_con.setAutoCommit(false);
+			String Qry = "INSERT INTO " + TBL_C07 + " (DATA_CODE, COMPANY_ID, SEND_DATE, SEQ_NO, READ_FLAG, class, " +
+					"HighPassSerial, cardno, tg_ent_datetime, tg_ext_datetime, tg_ent_name, tg_ext_name, corp_name_of_expr, " +
+					"org_tg_fee, disc_tg_fee, post_date, merchno, merbusino, reserve, crdsaInit, insert_time) " +
+					"VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ";
+			pst_c07 = db_con.prepareStatement(Qry);
+
+			int i_cnt = 0;
+			fis = new FileInputStream(file_path);
+			while(true) {
+				i_cnt++;
+				dataBuf = Util.readLineByte(fis);
+				if(dataBuf.length==0)	break;
+				if(!new String(dataBuf, 0, 1).equals("D"))	continue;
+
+				data_rec = new DtoDRecC07(dataBuf);
+				if(!data_rec.isNormal()) {
+					log.error("[CardHpss2DB] dataBuf("+i_cnt+")=["+new String(dataBuf)+"]");
+					log.error("[CardHpss2DB] "+data_rec.getAbnormalMsg());
+					commit_flag = false;
+					break;
+				}
+				log.trace("[CardHpss2DB] data_code=["+data_rec.getDATA_CODE()+"], company_id=["+data_rec.getCOMPANY_ID()+"], send_dt=["+data_rec.getSEND_DATE()+"], seq_no=["+data_rec.getSEQ_NO()+"]");
+
+				pst_c07.setString(1, data_rec.getDATA_CODE());
+				pst_c07.setString(2, data_rec.getCOMPANY_ID());
+				pst_c07.setString(3, data_rec.getSEND_DATE());
+				pst_c07.setString(4, data_rec.getSEQ_NO());
+				pst_c07.setString(5, data_rec.getREAD_FLAG());
+				pst_c07.setString(6, data_rec.getApClass());
+				pst_c07.setString(7, data_rec.getHighPassSerial());
+				pst_c07.setString(8, data_rec.getCardNo());
+				pst_c07.setString(9, data_rec.getTgEntDateTime());
+				pst_c07.setString(10, data_rec.getTgExtDateTime());
+				pst_c07.setString(11, data_rec.getTgEntName());
+				pst_c07.setString(12, data_rec.getTgExtName());
+				pst_c07.setString(13, data_rec.getCorpNameOfExpr());
+				pst_c07.setLong(14, data_rec.getOrgTgFee());
+				pst_c07.setLong(15, data_rec.getDiscTgFee());
+				pst_c07.setString(16, data_rec.getPostDate());
+				pst_c07.setString(17, data_rec.getMerchNo());
+				pst_c07.setString(18, data_rec.getMerBusiNo());
+				pst_c07.setString(19, data_rec.getReserve());
+				pst_c07.setString(20, data_rec.getCrdSaInit());
+				pst_c07.setString(21, getCurTm());
+
+				if(pst_c07.executeUpdate() != 1) {
+					log.error("[CardHpss2DB] INSERT WORK FAIL ~!!");
+					commit_flag = false;
+					break;
+				}
+				if(i_cnt > 1000000)	break;
+			}/*while end.*/
+
+			if(commit_flag)	db_con.commit();
+			else {
+				db_con.rollback();
+				result = false;
+			}
+		} catch (IOException e) {
+			log.error("[CardHpss2DB] "+e);
+			try{db_con.rollback();} catch (SQLException ignored){}
+			result = false;
+		} catch(SQLException e) {
+			log.error("[CorpCard2DB] "+e);
+			try{db_con.rollback();} catch (SQLException ignored){}
+			result = false;
+		} finally {
+			if(pst_c07 != null)	try{pst_c07.close();} catch (SQLException ignored){}
+			if(fis != null)	try{fis.close();} catch (IOException ignored){}
+		}
+
+		return result;
+	}
+
 	private Connection Connect2DB(String db_driver, String db_url, String db_user, String db_pass) {
 		try {
 			Class.forName(db_driver);
