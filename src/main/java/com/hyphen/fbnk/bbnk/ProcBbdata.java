@@ -432,7 +432,8 @@ public class ProcBbdata {
 				pst_c02.setString(29, data_rec.getMerchAddr2());	//DTL_ADDR
 				pst_c02.setString(30, data_rec.getVAT() != 0 ? "Y" : "N");	//VAT_PROC_YN
 				pst_c02.setString(31, data_rec.getMaster());		//FRCS_CEO_NM
-				pst_c02.setDouble(32, 0);						//INCOMEOC_AMT
+				if(data_rec.getAbroad().equals("B")) pst_c02.setDouble(32, data_rec.getApprTot());		//INCOMEOC_AMT
+				else pst_c02.setDouble(32, 0);
 				pst_c02.setDouble(33, 0);						//INCOMEOC_TAX_AMT
 				pst_c02.setString(34, "");						//CARD_TP
 				pst_c02.setString(35, data_rec.getApClass().equals("B") ? data_rec.getPurchDate().replace("/", "") : "");	//CNCL_DT
