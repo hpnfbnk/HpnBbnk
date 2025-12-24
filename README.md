@@ -22,7 +22,7 @@ pom.xml에 아래 내용을 추가해주시면 됩니다.
 <dependency>
     <groupId>com.github.hpnfbnk</groupId>
     <artifactId>HpnBbnk</artifactId>
-    <version>1.11.1</version>
+    <version>1.11.2</version>
 </dependency>
 ```
 

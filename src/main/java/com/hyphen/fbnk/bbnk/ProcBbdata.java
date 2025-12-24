@@ -223,9 +223,11 @@ public class ProcBbdata {
 			switch (info_cd) {
 				case "C01":
 					if (!Approval2DbDzn(file_path, db_con, ext_val_1)) result = false;
+					if(log.isTraceEnabled())	PrintDznState(db_con, ext_val_1);
 					break;
 				case "C02":
 					if (!Acquire2DbDzn(file_path, db_con, ext_val_1)) result = false;
+					if(log.isTraceEnabled())	PrintDznState(db_con, ext_val_1);
 					break;
 				default:
 					log.error("Unenrolled info_cd : " + info_cd);
@@ -240,6 +242,39 @@ public class ProcBbdata {
 		return result;
 	}
 
+	private void PrintDznState(Connection db_con, String tmp_tblnm){
+		String DznTbnlNm = tmp_tblnm.length() < 3 ? TBL_DZN : tmp_tblnm;
+
+		try {
+			String sQry = "SELECT INSERT_ID, INSERT_DTS, FINPRODUCT_NO, BANK_CD, TRAN_DT, TRAN_TM, NO_SQ, TRAN_AMT, APRVL_NO, APRVL_YN, BIZR_NO, FRGN_USE_YN " +
+					"FROM " + DznTbnlNm + " WHERE INSERT_ID='HYPHEN' AND INSERT_DTS=? ";
+			log.trace("[PrintDznState] sQry : "+ sQry);
+
+			PreparedStatement pst_dzn = db_con.prepareStatement(sQry);
+			pst_dzn.setDate(1, getCurSqlDate());
+
+			int i_cnt = 0;
+			ResultSet dzn_rs = pst_dzn.executeQuery();
+			while(dzn_rs.next()){
+				i_cnt++;
+				log.trace("[PrintDznState] INSERT_ID:"+ dzn_rs.getString("INSERT_ID").trim() +
+						", INSERT_DTS:" + dzn_rs.getDate("INSERT_DTS") +
+						", FINPRODUCT_NO:" + dzn_rs.getString("FINPRODUCT_NO").trim() +
+						", BANK_CD:" + dzn_rs.getString("BANK_CD").trim() +
+						", TRAN_DT:" + dzn_rs.getString("TRAN_DT").trim() +
+						", TRAN_TM:" + dzn_rs.getString("TRAN_TM").trim() +
+						", NO_SQ:" + dzn_rs.getString("NO_SQ").trim() +
+						", TRAN_AMT:" + dzn_rs.getDouble("TRAN_AMT") +
+						", APRVL_NO:" + dzn_rs.getString("APRVL_NO").trim() +
+						", APRVL_YN:" + dzn_rs.getString("APRVL_YN").trim() +
+						", BIZR_NO:" + dzn_rs.getString("BIZR_NO").trim() +
+						", FRGN_USE_YN:" + dzn_rs.getString("FRGN_USE_YN").trim());
+			}
+		} catch (SQLException e) {
+			log.error("[PrintDznState] "+ e);
+		}
+	}
+
 	private boolean Approval2DbDzn(String file_path, Connection db_con, String tmp_tblnm) {
 		boolean result = true;
 		boolean commit_flag = true;
@@ -249,11 +284,9 @@ public class ProcBbdata {
 		byte[] dataBuf = null;
 		String DznTbnlNm = tmp_tblnm.length() < 3 ? TBL_DZN : tmp_tblnm;
 
-
 		try {
 			db_con.setAutoCommit(false);
 			String Qry = "INSERT INTO " + DznTbnlNm + " (FINPRODUCT_NO, BANK_CD, TRAN_DT, TRAN_TM, NO_SQ, COMPANY_CD,  TRAN_AMT, TRAN_NM, INSM_MM, " +
-					//"APRVL_NO, APRVL_YN, BIZR_NO, DOCU_PROC_YN, INSERT_DT, INSERT_TM, INSERT_ID, PC_CD, APRVL_VAT_AMT, BIZTP_CD, BIZTP_NM, TEL_NO, " +
 					"APRVL_NO, APRVL_YN, BIZR_NO, DOCU_PROC_YN, INSERT_DT, INSERT_TM, INSERT_ID, APRVL_VAT_AMT, BIZTP_CD, BIZTP_NM, TEL_NO, " +
 					"POST_NO, BASE_ADDR, SPPRC_AMT, VAT_AMT, TIP_AMT, EXRT_RT, FRGN_USE_YN, EXCH_CD, DTL_ADDR, VAT_PROC_YN, FRCS_CEO_NM, INCOMEOC_AMT, " +
 					"INCOMEOC_TAX_AMT, CARD_TP, CNCL_DT, FRCS_NO, DOLLAR_CVRS_AMT, KRW_CVRS_AMT, PRCH_TKBAK_NO, CLOSE_DT, DOCU_AMT, VAT_TP_AMT, " +
@@ -279,7 +312,7 @@ public class ProcBbdata {
 				//해외사용여부(Abroad) 값이 국내(A)인 경우만 처리
 				if(!data_rec.getAbroad().equals("A"))	continue;
 
-				log.trace("[Approval2DbDzn] company_id:"+data_rec.getCompany_id()+", send_dt:"+data_rec.getSend_dt().trim()+
+				log.trace("[Approval2DbDzn]("+i_cnt+") company_id:"+data_rec.getCompany_id()+", send_dt:"+data_rec.getSend_dt().trim()+
 						", seq_no:"+data_rec.getSeq_no()+", ApprNo:"+data_rec.getApprNo()+", MerchName:"+data_rec.getMerchName()+
 						", Abroad:"+data_rec.getAbroad()+", ApClass:"+data_rec.getApClass());
 
@@ -368,7 +401,6 @@ public class ProcBbdata {
 		try {
 			db_con.setAutoCommit(false);
 			String Qry = "INSERT INTO " + DznTbnlNm + " (FINPRODUCT_NO, BANK_CD, TRAN_DT, TRAN_TM, NO_SQ, COMPANY_CD,  TRAN_AMT, TRAN_NM, INSM_MM, " +
-					//"APRVL_NO, APRVL_YN, BIZR_NO, DOCU_PROC_YN, INSERT_DT, INSERT_TM, INSERT_ID, PC_CD, APRVL_VAT_AMT, BIZTP_CD, BIZTP_NM, TEL_NO, " +
 					"APRVL_NO, APRVL_YN, BIZR_NO, DOCU_PROC_YN, INSERT_DT, INSERT_TM, INSERT_ID, APRVL_VAT_AMT, BIZTP_CD, BIZTP_NM, TEL_NO, " +
 					"POST_NO, BASE_ADDR, SPPRC_AMT, VAT_AMT, TIP_AMT, EXRT_RT, FRGN_USE_YN, EXCH_CD, DTL_ADDR, VAT_PROC_YN, FRCS_CEO_NM, INCOMEOC_AMT, " +
 					"INCOMEOC_TAX_AMT, CARD_TP, CNCL_DT, FRCS_NO, DOLLAR_CVRS_AMT, KRW_CVRS_AMT, PRCH_TKBAK_NO, CLOSE_DT, DOCU_AMT, VAT_TP_AMT, " +
@@ -394,7 +426,7 @@ public class ProcBbdata {
 				//해외사용여부(Abroad) 값이 해외(B)이거나, 해외사용여부(Abroad) 값이 국내(A)이고 매입취소(B)인 건만 처리
 				if(!(data_rec.getAbroad().equals("B")||(data_rec.getAbroad().equals("A")&&data_rec.getApClass().equals("B"))))	continue;
 
-				log.trace("[Acquire2DbDzn] company_id:"+data_rec.getCOMPANY_ID()+", send_dt:"+data_rec.getSEND_DT().trim()+
+				log.trace("[Acquire2DbDzn]("+i_cnt+") company_id:"+data_rec.getCOMPANY_ID()+", send_dt:"+data_rec.getSEND_DT().trim()+
 						", seq_no:"+data_rec.getSEQ_NO()+", ApprNo:"+data_rec.getApprNo()+", MerchName:"+data_rec.getMerchName()+
 						", Abroad:"+data_rec.getAbroad()+", ApClass:"+data_rec.getApClass());
 

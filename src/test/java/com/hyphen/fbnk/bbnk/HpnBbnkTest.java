@@ -209,7 +209,7 @@ public class HpnBbnkTest {
         String sendCd   = "1096";
         String recvCd   = "A002";
         String infoCd   = "ZZZ";
-        String sendDt   = "20250930";
+        String sendDt   = "20250811";
         String runMode  = "T";
         String dbDriver = "org.gjt.mm.mysql.Driver";
         String dbUrl = "jdbc:mysql://localhost:3306/test?serverTimezone=Asia/Seoul&useSSL=false";
@@ -220,8 +220,8 @@ public class HpnBbnkTest {
 
         //List<DtoFileList> dtoFileLists = hpnBbnk.recvDataMulti2DB(recvCd, sendCd, infoCd, sendDt, sendDt, "E", "", "./sample", runMode, dbDriver, dbUrl, dbUser, dbPass, "");
         //List<DtoFileList> dtoFileLists = hpnBbnk.recvDataMulti2DB(recvCd, sendCd, infoCd, sendDt, sendDt, "E", "", "./sample", runMode, dbDriver, dbUrl, dbUser, dbPass, "tcUF3A2WRsW1BdQNlrZlsQ");
-        List<DtoFileList> dtoFileLists = hpnBbnk.recvDataMulti2DB(recvCd, sendCd, infoCd, sendDt, sendDt, "E", "", "./sample", runMode, dbDriver, dbUrl, dbUser, dbPass);
-        //List<DtoFileList> dtoFileLists = hpnBbnk.recvDataMulti2DB(recvCd, sendCd, infoCd, sendDt, sendDt, "E", "", "./sample", runMode, dbDriver, dbUrl, dbUser, dbPass, "", dbType, dbTblNm, "", "");
+        //List<DtoFileList> dtoFileLists = hpnBbnk.recvDataMulti2DB(recvCd, sendCd, infoCd, sendDt, sendDt, "E", "", "./sample", runMode, dbDriver, dbUrl, dbUser, dbPass);
+        List<DtoFileList> dtoFileLists = hpnBbnk.recvDataMulti2DB(recvCd, sendCd, infoCd, sendDt, sendDt, "E", "", "./sample", runMode, dbDriver, dbUrl, dbUser, dbPass, "", dbType, dbTblNm, "", "");
         if(dtoFileLists.isEmpty())
             System.out.println("hpnBbnk.recvDataMulti2DB : NO_DATA");
         else
