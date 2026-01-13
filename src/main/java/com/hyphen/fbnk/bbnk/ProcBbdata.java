@@ -257,20 +257,24 @@ public class ProcBbdata {
 			ResultSet dzn_rs = pst_dzn.executeQuery();
 			while(dzn_rs.next()){
 				i_cnt++;
-				log.trace("[PrintDznState] INSERT_ID:"+ dzn_rs.getString("INSERT_ID").trim() +
-						", INSERT_DTS:" + dzn_rs.getDate("INSERT_DTS") +
-						", FINPRODUCT_NO:" + dzn_rs.getString("FINPRODUCT_NO").trim() +
-						", BANK_CD:" + dzn_rs.getString("BANK_CD").trim() +
-						", TRAN_DT:" + dzn_rs.getString("TRAN_DT").trim() +
-						", TRAN_TM:" + dzn_rs.getString("TRAN_TM").trim() +
-						", NO_SQ:" + dzn_rs.getString("NO_SQ").trim() +
-						", TRAN_AMT:" + dzn_rs.getDouble("TRAN_AMT") +
-						", APRVL_NO:" + dzn_rs.getString("APRVL_NO").trim() +
-						", APRVL_YN:" + dzn_rs.getString("APRVL_YN").trim() +
-						", BIZR_NO:" + dzn_rs.getString("BIZR_NO").trim() +
-						", FRGN_USE_YN:" + dzn_rs.getString("FRGN_USE_YN").trim());
-			}
-		} catch (SQLException e) {
+				try {
+					log.trace("[PrintDznState] INSERT_ID:" + dzn_rs.getString("INSERT_ID") +
+							", INSERT_DTS:" + dzn_rs.getDate("INSERT_DTS") +
+							", FINPRODUCT_NO:" + dzn_rs.getString("FINPRODUCT_NO") +
+							", BANK_CD:" + dzn_rs.getString("BANK_CD") +
+							", TRAN_DT:" + dzn_rs.getString("TRAN_DT") +
+							", TRAN_TM:" + dzn_rs.getString("TRAN_TM") +
+							", NO_SQ:" + dzn_rs.getString("NO_SQ") +
+							", TRAN_AMT:" + dzn_rs.getDouble("TRAN_AMT") +
+							", APRVL_NO:" + dzn_rs.getString("APRVL_NO") +
+							", APRVL_YN:" + dzn_rs.getString("APRVL_YN") +
+							", BIZR_NO:" + dzn_rs.getString("BIZR_NO") +
+							", FRGN_USE_YN:" + dzn_rs.getString("FRGN_USE_YN"));
+				} catch (Exception e) {
+					log.error("[PrintDznState] "+ e);
+				}
+			}//while end.
+		} catch (Exception e) {
 			log.error("[PrintDznState] "+ e);
 		}
 	}
