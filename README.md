@@ -1,5 +1,5 @@
 # HYPHEN BatchFirmBanking Module
-하이픈-배치펌뱅킹서비스용 연동모듈입니다.
+Java Plug-in 모듈 : java 프로젝트에서 import 해 사용하실 수 있는 파일송수신method 등이 포함되있는 jar형태의 라이브러리 및 업무관련자료들입니다.
 
 ## 요구사항
 JAVA 1.7 이상을 요구합니다.
