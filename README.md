@@ -299,5 +299,7 @@ List<DtoPay> dtoPayList = (List<DtoPay>) hpnBbnk.recvDataDto("0081", "A004", "30
 - [배치펌뱅킹-은행포맷.zip](https://hpnfbnk.github.io/HpnBbnk/배치펌뱅킹-은행포맷.zip) : 은행별 파일포맷
 - [출금이체정보_통합관리시스템_전산설계서(HYPHEN)V3.8.pdf](https://hpnfbnk.github.io/HpnBbnk/출금이체정보_통합관리시스템_전산설계서(HYPHEN)V3.8.pdf) : 금결원 PAYINFO 업무용 안내문서
 - [출금이체정보_통합관리시스템_전산설계서(HYPHEN-배치대행업체용)V3.3.1.docx](https://hpnfbnk.github.io/HpnBbnk/출금이체정보_통합관리시스템_전산설계서(HYPHEN-배치대행업체용)V3.3.1.docx) : 금결원 PAYINFO 업무용 안내문서(배치대행업체용) 
+- [SCH_INST.zip](https://hpnfbnk.github.io/HpnBbnk/SCH_INST.zip) : 스쿨뱅킹 설치 파일
+- [Wsb2002.zip](https://hpnfbnk.github.io/HpnBbnk/Wsb2002.zip) : 스쿨뱅킹 실행 파일
 
 
